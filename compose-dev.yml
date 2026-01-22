@@ -1,0 +1,65 @@
+services:
+  mysql-db:
+    image: 'mysql:8.1.0'
+    container_name: mysql_db
+    environment:
+      - 'MYSQL_DATABASE=${DB_NAME}'
+      - 'MYSQL_USER=${DB_USER}'
+      - 'MYSQL_PASSWORD=${DB_PASSWORD}'
+      - 'MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}'
+    ports:
+      - '3306'
+    restart: on-failure
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./src/main/resources/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h localhost -u $${MYSQL_USER} -p$${MYSQL_PASSWORD}']
+      interval: 20s
+      timeout: 10s
+      retries: 5
+    env_file:
+      - .env
+
+  fenix-commerce-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: app:v1
+    container_name: fenix_commerce_app
+    ports:
+      - '8080:8080'
+    environment:
+      DB_HOST: "mysql_db"
+      DB_PORT: "3306"
+      DB_NAME: "${DB_NAME}"
+      DB_USER: "${DB_USER}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      JAVA_OPTS: >-
+        -XX:+ExitOnOutOfMemoryError
+        -XX:+HeapDumpOnOutOfMemoryError
+        -XX:HeapDumpPath=/var/dumps
+        -XX:MaxRAMPercentage=50
+        -Xss256k
+        -XX:ReservedCodeCacheSize=64m
+        -XX:MaxMetaspaceSize=96m
+        -XX:+UseStringDeduplication
+      APP_ARGS: >-
+        --server.shutdown=immediate
+        --spring.profiles.active=mysql,dev
+        --app.openapi.host=localhost
+        --app.openapi.port=8080
+    healthcheck:
+      test: [ "CMD-SHELL", "nc -z localhost 8080 || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    env_file:
+      - .env
+
+volumes:
+  mysql_data:
+    driver: local
