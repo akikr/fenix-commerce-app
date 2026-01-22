@@ -1,12 +1,15 @@
 package io.akikr.app;
 
+import io.akikr.app.shared.AppLoggingProperties;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
+@EnableConfigurationProperties(value = {AppLoggingProperties.class})
 public class FenixCommerceApp {
 
   private static final Logger log = LoggerFactory.getLogger(FenixCommerceApp.class);
