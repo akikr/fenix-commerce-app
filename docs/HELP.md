@@ -2,7 +2,7 @@
 
 ## Entity Relationship Diagram
 
-![entuty-relation-daigram](./docs/erd.png)
+![entuty-relation-daigram](./erd.png)
 
 ## Relationship Matrix
 
