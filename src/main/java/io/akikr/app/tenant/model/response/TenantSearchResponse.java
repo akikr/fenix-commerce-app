@@ -5,6 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public record TenantSearchResponse(
     @JsonProperty(value = "externalId") String externalId,
     @JsonProperty(value = "name") String name,
-    @JsonProperty(value = "statusCode") String status,
+    @JsonProperty(value = "status") String status,
     @JsonProperty(value = "createdAt") String createdAt,
     @JsonProperty(value = "updatedAt") String updatedAt) {}
