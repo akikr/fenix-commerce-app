@@ -293,9 +293,12 @@ public class TenantServiceImpl implements TenantService {
   private static Tenant buildTenant(TenantPatchRequest request, Tenant tenant) {
     return Tenant.builder()
         .tenantId(tenant.getTenantId())
-        .tenantName((hasText(request.name()) ? request.name() : tenant.getTenantName()))
+        .tenantName(
+            (Objects.nonNull(request.name()) && hasText(request.name())
+                ? request.name()
+                : tenant.getTenantName()))
         .status(
-            (hasText(request.status().name())
+            (Objects.nonNull(request.status()) && hasText(request.status().name())
                 ? Status.valueOf(request.status().name())
                 : tenant.getStatus()))
         .build();
