@@ -36,4 +36,23 @@ public class TenantControllerExceptionHandler {
         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .body(errorResponse);
   }
+
+  @ExceptionHandler(TenantException.class)
+  public ResponseEntity<ErrorResponse> handleTenantException(TenantException ex) {
+    log.error(
+        "Error occurred at TenantController handleTenantException, due to {}", ex.getMessage(), ex);
+
+    String exMessage = ex.getMessage();
+    String truncatedErrorMessage = exMessage.substring(0, Math.min(exMessage.length(), 80)) + "...";
+    var errorResponse =
+        new ErrorResponse(
+            LocalDateTime.now().atOffset(ZoneOffset.UTC).toString(),
+            ex.getStatus(),
+            ex.getMessage(),
+            truncatedErrorMessage,
+            ex.getPath());
+    return ResponseEntity.status(HttpStatus.valueOf(ex.getStatus()))
+        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .body(errorResponse);
+  }
 }

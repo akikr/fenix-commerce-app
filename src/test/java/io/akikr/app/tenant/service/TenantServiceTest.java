@@ -2,20 +2,19 @@ package io.akikr.app.tenant.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import io.akikr.app.shared.ErrorResponse;
 import io.akikr.app.shared.PagedResponse;
 import io.akikr.app.tenant.entity.Tenant;
-import io.akikr.app.tenant.model.TenantCreateRequest;
-import io.akikr.app.tenant.model.TenantCreateResponse;
-import io.akikr.app.tenant.model.TenantDto;
-import io.akikr.app.tenant.model.TenantPatchRequest;
+import io.akikr.app.tenant.exceptions.TenantException;
 import io.akikr.app.tenant.model.TenantStatus;
-import io.akikr.app.tenant.model.TenantUpdateRequest;
+import io.akikr.app.tenant.model.request.TenantCreateRequest;
+import io.akikr.app.tenant.model.request.TenantPatchRequest;
+import io.akikr.app.tenant.model.request.TenantUpdateRequest;
 import io.akikr.app.tenant.repository.TenantRepository;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -68,12 +67,14 @@ class TenantServiceTest {
     when(tenantRepository.save(any(Tenant.class))).thenReturn(tenant);
 
     // Act
-    ResponseEntity<?> responseEntity = tenantService.createTenant(request);
+    var responseEntity = tenantService.createTenant(request);
 
     // Assert
+    assertNotNull(responseEntity);
     assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-    assertInstanceOf(TenantCreateResponse.class, responseEntity.getBody());
-    TenantCreateResponse response = (TenantCreateResponse) responseEntity.getBody();
+
+    var response = responseEntity.getBody();
+    assertNotNull(response);
     assertEquals(tenantId.toString(), response.externalId());
   }
 
@@ -83,15 +84,13 @@ class TenantServiceTest {
     // Arrange
     TenantCreateRequest request =
         new TenantCreateRequest(tenantId.toString(), "test-tenant", TenantStatus.ACTIVE);
+
+    // Mock
     when(tenantRepository.save(any(Tenant.class)))
         .thenThrow(new IllegalArgumentException("Invalid data"));
 
-    // Act
-    ResponseEntity<?> responseEntity = tenantService.createTenant(request);
-
-    // Assert
-    assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-    assertInstanceOf(ErrorResponse.class, responseEntity.getBody());
+    // Act & Assert
+    assertThrowsExactly(TenantException.class, () -> tenantService.createTenant(request));
   }
 
   // Search Tenants Tests
@@ -117,15 +116,12 @@ class TenantServiceTest {
   void testSearchTenants_Failure() {
     // Arrange
     when(tenantRepository.findAll(any(Specification.class), any(PageRequest.class)))
-        .thenThrow(new RuntimeException("DB error"));
+        .thenThrow(new IllegalArgumentException("DB errorDetails"));
 
-    // Act
-    ResponseEntity<?> responseEntity =
-        tenantService.searchTenants(null, null, 0, 10, "updatedAt,desc", null, null);
-
-    // Assert
-    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-    assertTrue(responseEntity.getBody() instanceof ErrorResponse);
+    // Act & Assert
+    assertThrowsExactly(
+        TenantException.class,
+        () -> tenantService.searchTenants(null, null, 0, 10, "updatedAt,desc", null, null));
   }
 
   // Get Tenant By ID Tests
@@ -136,11 +132,14 @@ class TenantServiceTest {
     when(tenantRepository.findByTenantId(tenantId)).thenReturn(Optional.of(tenant));
 
     // Act
-    ResponseEntity<?> responseEntity = tenantService.getTenantById(tenantId.toString());
+    var responseEntity = tenantService.getTenantById(tenantId.toString());
 
     // Assert
+    assertNotNull(responseEntity);
     assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-    assertInstanceOf(TenantDto.class, responseEntity.getBody());
+    var responseBody = responseEntity.getBody();
+    assertNotNull(responseBody);
+    assertEquals(tenantId.toString(), responseBody.externalId());
   }
 
   @Test
@@ -149,12 +148,9 @@ class TenantServiceTest {
     // Arrange
     when(tenantRepository.findByTenantId(tenantId)).thenReturn(Optional.empty());
 
-    // Act
-    ResponseEntity<?> responseEntity = tenantService.getTenantById(tenantId.toString());
-
-    // Assert
-    assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
-    assertInstanceOf(ErrorResponse.class, responseEntity.getBody());
+    // Act & Assert
+    assertThrowsExactly(
+        TenantException.class, () -> tenantService.getTenantById(tenantId.toString()));
   }
 
   // Update Tenant Tests
@@ -167,11 +163,13 @@ class TenantServiceTest {
     when(tenantRepository.save(any(Tenant.class))).thenReturn(tenant);
 
     // Act
-    ResponseEntity<?> responseEntity = tenantService.updateTenant(tenantId.toString(), request);
+    var responseEntity = tenantService.updateTenant(tenantId.toString(), request);
 
     // Assert
+    assertNotNull(responseEntity);
     assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-    assertInstanceOf(TenantDto.class, responseEntity.getBody());
+    var response = responseEntity.getBody();
+    assertNotNull(response);
   }
 
   @Test
@@ -196,11 +194,13 @@ class TenantServiceTest {
     when(tenantRepository.save(any(Tenant.class))).thenReturn(tenant);
 
     // Act
-    ResponseEntity<?> responseEntity = tenantService.patchTenant(tenantId.toString(), request);
+    var responseEntity = tenantService.patchTenant(tenantId.toString(), request);
 
     // Assert
+    assertNotNull(responseEntity);
     assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-    assertInstanceOf(TenantDto.class, responseEntity.getBody());
+    var response = responseEntity.getBody();
+    assertNotNull(response);
   }
 
   @Test
@@ -210,7 +210,7 @@ class TenantServiceTest {
     TenantPatchRequest request = new TenantPatchRequest("patched-name", null);
     when(tenantRepository.findByTenantId(tenantId)).thenReturn(Optional.empty());
 
-    // Act and Assert
+    // Act & Assert
     assertThrows(
         RuntimeException.class, () -> tenantService.patchTenant(tenantId.toString(), request));
   }

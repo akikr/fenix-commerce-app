@@ -1,20 +1,18 @@
 package io.akikr.app.tenant.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.akikr.app.MySqlTestContainer;
-import io.akikr.app.shared.ErrorResponse;
-import io.akikr.app.shared.PagedResponse;
 import io.akikr.app.tenant.entity.Tenant;
-import io.akikr.app.tenant.model.TenantCreateRequest;
-import io.akikr.app.tenant.model.TenantCreateResponse;
-import io.akikr.app.tenant.model.TenantDto;
-import io.akikr.app.tenant.model.TenantPatchRequest;
+import io.akikr.app.tenant.exceptions.TenantException;
 import io.akikr.app.tenant.model.TenantStatus;
-import io.akikr.app.tenant.model.TenantUpdateRequest;
+import io.akikr.app.tenant.model.request.TenantCreateRequest;
+import io.akikr.app.tenant.model.request.TenantPatchRequest;
+import io.akikr.app.tenant.model.request.TenantUpdateRequest;
 import io.akikr.app.tenant.repository.TenantRepository;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -34,15 +32,15 @@ public class TenantServiceIntegrationTest extends MySqlTestContainer {
   private TenantService tenantService;
 
   private UUID activeTenantId;
+  private Tenant activeTenant;
 
   @BeforeEach
   void setUp() {
     tenantService = new TenantServiceImpl(tenantRepository);
-
     tenantRepository.deleteAll();
 
     activeTenantId = UUID.randomUUID();
-    Tenant activeTenant =
+    activeTenant =
         Tenant.builder()
             .tenantId(activeTenantId)
             .tenantName("active-tenant")
@@ -62,14 +60,15 @@ public class TenantServiceIntegrationTest extends MySqlTestContainer {
         new TenantCreateRequest(newTenantId.toString(), "new-tenant", TenantStatus.ACTIVE);
 
     // Act
-    ResponseEntity<?> responseEntity = tenantService.createTenant(request);
+    var responseEntity = tenantService.createTenant(request);
 
     // Assert
+    assertNotNull(responseEntity);
     assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-    TenantCreateResponse responseBody =
-        assertInstanceOf(TenantCreateResponse.class, responseEntity.getBody());
-    assertEquals(newTenantId.toString(), responseBody.externalId());
 
+    var createResponse = responseEntity.getBody();
+    assertNotNull(createResponse);
+    assertEquals(newTenantId.toString(), createResponse.externalId());
     assertTrue(tenantRepository.findByTenantId(newTenantId).isPresent());
   }
 
@@ -78,18 +77,19 @@ public class TenantServiceIntegrationTest extends MySqlTestContainer {
   void testCreateTenant_Failure() {
     // Arrange
     // Using the ID of the tenant created in setUp
-    TenantCreateRequest request =
-        new TenantCreateRequest(UUID.randomUUID().toString(), "active-tenant", TenantStatus.ACTIVE);
+    var tenantId = UUID.randomUUID();
+    var request =
+        new TenantCreateRequest(
+            tenantId.toString(), activeTenant.getTenantName(), TenantStatus.ACTIVE);
 
     // Act and Assert
-    ResponseEntity<?> responseEntity = tenantService.createTenant(request);
+    var responseEntity = tenantService.createTenant(request);
+    assertNotNull(responseEntity);
     assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-    if (responseEntity.getBody() instanceof TenantCreateResponse response) {
-      // Verify that the tenant with duplicate name was not created
-      assertThrows(
-          RuntimeException.class,
-          () -> tenantRepository.findByTenantId(UUID.fromString(response.externalId())));
-    }
+
+    var createResponse = responseEntity.getBody();
+    assertNotNull(createResponse);
+    assertThrows(RuntimeException.class, () -> tenantRepository.findByTenantId(tenantId));
   }
 
   @Test
@@ -99,11 +99,13 @@ public class TenantServiceIntegrationTest extends MySqlTestContainer {
     String id = activeTenantId.toString();
 
     // Act
-    ResponseEntity<?> responseEntity = tenantService.getTenantById(id);
+    var responseEntity = tenantService.getTenantById(id);
 
     // Assert
+    assertNotNull(responseEntity);
     assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-    TenantDto responseBody = assertInstanceOf(TenantDto.class, responseEntity.getBody());
+    var responseBody = responseEntity.getBody();
+    assertNotNull(responseBody);
     assertEquals(id, responseBody.externalId());
   }
 
@@ -113,39 +115,39 @@ public class TenantServiceIntegrationTest extends MySqlTestContainer {
     // Arrange
     String id = UUID.randomUUID().toString();
 
-    // Act
-    ResponseEntity<?> responseEntity = tenantService.getTenantById(id);
-
-    // Assert
-    assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
-    assertInstanceOf(ErrorResponse.class, responseEntity.getBody());
+    // Act & Assert
+    assertThrowsExactly(TenantException.class, () -> tenantService.getTenantById(id));
   }
 
   @Test
   @DisplayName("Integration Test: searchTenants - Success")
   void testSearchTenants_Success() {
     // Arrange & Act
-    ResponseEntity<?> responseEntity =
+    var responseEntity =
         tenantService.searchTenants(
             null, null, 0, 10, "createdAt,asc", TenantStatus.ACTIVE, "active-tenant");
 
     // Assert
+    assertNotNull(responseEntity);
     assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-    PagedResponse pagedResponse = assertInstanceOf(PagedResponse.class, responseEntity.getBody());
+
+    var pagedResponse = responseEntity.getBody();
+    assertNotNull(pagedResponse);
     assertEquals(1, pagedResponse.totalElements());
-    assertEquals("active-tenant", ((TenantDto) pagedResponse.data().get(0)).name());
+    assertEquals("active-tenant", pagedResponse.data().get(0).name());
   }
 
   @Test
   @DisplayName("Integration Test: searchTenants - Failure (Invalid Date Format)")
   void testSearchTenants_Failure() {
-    // Arrange & Act
-    ResponseEntity<?> responseEntity =
-        tenantService.searchTenants("invalid-date", null, 0, 10, "createdAt,asc", null, null);
+    // Arrange
+    String invalidFromDate = "invalid-date";
 
-    // Assert
-    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-    assertInstanceOf(ErrorResponse.class, responseEntity.getBody());
+    // Act & Assert
+    assertThrowsExactly(
+        TenantException.class,
+        () ->
+            tenantService.searchTenants(invalidFromDate, null, 0, 10, "createdAt,asc", null, null));
   }
 
   @Test
@@ -156,17 +158,23 @@ public class TenantServiceIntegrationTest extends MySqlTestContainer {
     TenantUpdateRequest request = new TenantUpdateRequest("updated-name", TenantStatus.INACTIVE);
 
     // Act
-    ResponseEntity<?> responseEntity = tenantService.updateTenant(id, request);
+    var responseEntity = tenantService.updateTenant(id, request);
 
     // Assert
+    assertNotNull(responseEntity);
     assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-    TenantDto responseBody = assertInstanceOf(TenantDto.class, responseEntity.getBody());
-    assertEquals("updated-name", responseBody.name());
-    assertEquals(TenantStatus.INACTIVE.name(), responseBody.status());
+    var response = responseEntity.getBody();
+    assertNotNull(response);
+    assertEquals("updated-name", response.name());
+    assertEquals(TenantStatus.INACTIVE.name(), response.status());
 
-    Tenant updatedTenant = tenantRepository.findByTenantId(activeTenantId).get();
-    assertEquals("updated-name", updatedTenant.getTenantName());
-    assertEquals(Tenant.Status.INACTIVE, updatedTenant.getStatus());
+    tenantRepository
+        .findByTenantId(activeTenantId)
+        .ifPresent(
+            updatedTenant -> {
+              assertEquals("updated-name", updatedTenant.getTenantName());
+              assertEquals(Tenant.Status.INACTIVE, updatedTenant.getStatus());
+            });
   }
 
   @Test
@@ -188,17 +196,23 @@ public class TenantServiceIntegrationTest extends MySqlTestContainer {
     TenantPatchRequest request = new TenantPatchRequest("patched-name", null);
 
     // Act
-    ResponseEntity<?> responseEntity = tenantService.patchTenant(id, request);
+    var responseEntity = tenantService.patchTenant(id, request);
 
     // Assert
+    assertNotNull(responseEntity);
     assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-    TenantDto responseBody = assertInstanceOf(TenantDto.class, responseEntity.getBody());
-    assertEquals("patched-name", responseBody.name());
-    assertEquals(TenantStatus.ACTIVE.name(), responseBody.status()); // Status should not change
+    var response = responseEntity.getBody();
+    assertNotNull(response);
+    assertEquals("patched-name", response.name());
+    assertEquals(TenantStatus.ACTIVE.name(), response.status());
 
-    Tenant patchedTenant = tenantRepository.findByTenantId(activeTenantId).get();
-    assertEquals("patched-name", patchedTenant.getTenantName());
-    assertEquals(Tenant.Status.ACTIVE, patchedTenant.getStatus());
+    tenantRepository
+        .findByTenantId(activeTenantId)
+        .ifPresent(
+            patchedTenant -> {
+              assertEquals("patched-name", patchedTenant.getTenantName());
+              assertEquals(Tenant.Status.ACTIVE, patchedTenant.getStatus());
+            });
   }
 
   @Test

@@ -12,10 +12,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.akikr.app.MySqlTestContainer;
 import io.akikr.app.tenant.entity.Tenant;
-import io.akikr.app.tenant.model.TenantCreateRequest;
-import io.akikr.app.tenant.model.TenantPatchRequest;
 import io.akikr.app.tenant.model.TenantStatus;
-import io.akikr.app.tenant.model.TenantUpdateRequest;
+import io.akikr.app.tenant.model.request.TenantCreateRequest;
+import io.akikr.app.tenant.model.request.TenantPatchRequest;
+import io.akikr.app.tenant.model.request.TenantUpdateRequest;
 import io.akikr.app.tenant.repository.TenantRepository;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -58,8 +58,8 @@ class TenantControllerTest extends MySqlTestContainer {
   @DisplayName("API Test: createTenant - Success")
   void createTenant_Success() throws Exception {
     // Arrange
-    UUID newTenantId = UUID.randomUUID();
-    TenantCreateRequest request =
+    var newTenantId = UUID.randomUUID();
+    var request =
         new TenantCreateRequest(newTenantId.toString(), "new-tenant", TenantStatus.ACTIVE);
 
     // Act & Assert

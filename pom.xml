@@ -36,8 +36,8 @@
     <scm>
         <tag>HEAD</tag>
         <url>https://github.com/akikr.io/fenix-commerce-app</url>
-        <connection/>
-        <developerConnection/>
+        <connection>scm:git:git://github.com/akikr.io/fenix-commerce-app.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/akikr.io/fenix-commerce-app.git</developerConnection>
     </scm>
 
     <properties>

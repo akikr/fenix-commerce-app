@@ -165,7 +165,7 @@ class TenantRepositoryTest extends MySqlTestContainer {
   }
 
   @Test
-  @DisplayName("Test findAll with status filter")
+  @DisplayName("Test findAll with statusCode filter")
   void testFindAll_withStatusFilter() {
     // Arrange
     Specification<Tenant> spec =

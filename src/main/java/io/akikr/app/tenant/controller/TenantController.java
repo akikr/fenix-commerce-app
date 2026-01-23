@@ -1,9 +1,15 @@
 package io.akikr.app.tenant.controller;
 
-import io.akikr.app.tenant.model.TenantCreateRequest;
-import io.akikr.app.tenant.model.TenantPatchRequest;
+import io.akikr.app.shared.PagedResponse;
 import io.akikr.app.tenant.model.TenantStatus;
-import io.akikr.app.tenant.model.TenantUpdateRequest;
+import io.akikr.app.tenant.model.request.TenantCreateRequest;
+import io.akikr.app.tenant.model.request.TenantPatchRequest;
+import io.akikr.app.tenant.model.request.TenantUpdateRequest;
+import io.akikr.app.tenant.model.response.TenantCreateResponse;
+import io.akikr.app.tenant.model.response.TenantPatchResponse;
+import io.akikr.app.tenant.model.response.TenantResponse;
+import io.akikr.app.tenant.model.response.TenantSearchResponse;
+import io.akikr.app.tenant.model.response.TenantUpdateResponse;
 import io.akikr.app.tenant.service.TenantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,13 +39,14 @@ public class TenantController {
 
   @Operation(method = "Create organization")
   @PostMapping
-  public ResponseEntity<?> createTenant(@RequestBody TenantCreateRequest request) {
+  public ResponseEntity<TenantCreateResponse> createTenant(
+      @RequestBody TenantCreateRequest request) {
     return tenantService.createTenant(request);
   }
 
   @Operation(method = "Search organizations (date range + pagination)")
   @GetMapping
-  public ResponseEntity<?> searchTenants(
+  public ResponseEntity<PagedResponse<TenantSearchResponse>> searchTenants(
       @RequestParam(name = "from", required = false) String fromDate,
       @RequestParam(name = "to", required = false) String toDate,
       @RequestParam(name = "page", defaultValue = "0", required = false) Integer page,
@@ -53,7 +60,7 @@ public class TenantController {
 
   @Operation(method = "Search organizations by external-id")
   @GetMapping(path = "/search")
-  public ResponseEntity<?> searchTenantsByExternalId(
+  public ResponseEntity<PagedResponse<TenantSearchResponse>> searchTenantsByExternalId(
       @RequestParam(name = "externalId") String externalId,
       @RequestParam(name = "page", defaultValue = "0", required = false) Integer page,
       @RequestParam(name = "size", defaultValue = "50", required = false) Integer size) {
@@ -62,27 +69,27 @@ public class TenantController {
 
   @Operation(method = "Get organization by id")
   @GetMapping(path = "/{id}")
-  public ResponseEntity<?> getTenantById(@PathVariable String id) {
+  public ResponseEntity<TenantResponse> getTenantById(@PathVariable String id) {
     return tenantService.getTenantById(id);
   }
 
   @Operation(method = "Update organization (full replace)")
   @PutMapping(path = "/{id}")
-  public ResponseEntity<?> updateTenant(
+  public ResponseEntity<TenantUpdateResponse> updateTenant(
       @PathVariable String id, @RequestBody TenantUpdateRequest request) {
     return tenantService.updateTenant(id, request);
   }
 
   @Operation(method = "Update organization (partial)")
   @PatchMapping(path = "/{id}")
-  public ResponseEntity<?> patchTenant(
+  public ResponseEntity<TenantPatchResponse> patchTenant(
       @PathVariable String id, @RequestBody TenantPatchRequest request) {
     return tenantService.patchTenant(id, request);
   }
 
   @Operation(method = "Delete organization (soft delete/deactivate)")
   @DeleteMapping(path = "/{id}")
-  public ResponseEntity<?> deleteTenant(@PathVariable String id) {
+  public ResponseEntity<Object> deleteTenant(@PathVariable String id) {
     return tenantService.deleteTenant(id);
   }
 }
