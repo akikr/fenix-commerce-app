@@ -15,7 +15,7 @@ public abstract class MySqlTestContainer {
 
   @ServiceConnection
   static final MySQLContainer<?> mySqlContainer =
-      new MySQLContainer<>(DockerImageName.parse("mysql:8.1.0"))
+      new MySQLContainer<>(DockerImageName.parse("mysql:8.4.8"))
           // Optional: Use an init script to set up the database schema, this script should be in
           // src/test/resources folder
           .withInitScript("schema.sql")

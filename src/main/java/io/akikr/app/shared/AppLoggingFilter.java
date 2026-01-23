@@ -67,7 +67,7 @@ public class AppLoggingFilter extends GenericFilter {
     if (servletRequest instanceof ContentCachingRequestWrapper requestWrapper) {
       return requestWrapper;
     }
-    return new ContentCachingRequestWrapper((HttpServletRequest) servletRequest, 0);
+    return new ContentCachingRequestWrapper((HttpServletRequest) servletRequest, Integer.MAX_VALUE);
   }
 
   private ContentCachingResponseWrapper responseWrapper(ServletResponse servletResponse) {
