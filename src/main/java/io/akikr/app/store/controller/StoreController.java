@@ -3,13 +3,14 @@ package io.akikr.app.store.controller;
 import io.akikr.app.shared.PagedResponse;
 import io.akikr.app.store.model.StorePlatform;
 import io.akikr.app.store.model.StoreStatus;
-import io.akikr.app.store.model.request.CreateStoreRequest;
-import io.akikr.app.store.model.request.PatchStoreRequest;
-import io.akikr.app.store.model.request.UpdateStoreRequest;
-import io.akikr.app.store.model.response.CreateStoreResponse;
-import io.akikr.app.store.model.response.PatchStoreResponse;
-import io.akikr.app.store.model.response.SearchStoreResponse;
-import io.akikr.app.store.model.response.UpdateStoreResponse;
+import io.akikr.app.store.model.request.StoreCreateRequest;
+import io.akikr.app.store.model.request.StorePatchRequest;
+import io.akikr.app.store.model.request.StoreUpdateRequest;
+import io.akikr.app.store.model.response.StoreCreateResponse;
+import io.akikr.app.store.model.response.StorePatchResponse;
+import io.akikr.app.store.model.response.StoreResponse;
+import io.akikr.app.store.model.response.StoreSearchResponse;
+import io.akikr.app.store.model.response.StoreUpdateResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -31,15 +32,15 @@ public class StoreController {
 
   @Operation(summary = "Create website for organization")
   @PostMapping
-  public ResponseEntity<CreateStoreResponse> createStore(
-      @PathVariable String orgId, @RequestBody CreateStoreRequest request) {
+  public ResponseEntity<StoreCreateResponse> createStore(
+      @PathVariable String orgId, @RequestBody StoreCreateRequest request) {
     // TODO: Implement service layer
     return ResponseEntity.ok().build();
   }
 
   @Operation(summary = "List/search websites for organization (date range + pagination)")
   @GetMapping
-  public ResponseEntity<PagedResponse<SearchStoreResponse>> listStores(
+  public ResponseEntity<PagedResponse<StoreSearchResponse>> listStores(
       @PathVariable String orgId,
       @RequestParam(name = "from", required = false) String fromDate,
       @RequestParam(name = "to", required = false) String toDate,
@@ -56,7 +57,7 @@ public class StoreController {
 
   @Operation(summary = "Search websites within an organization by websiteId/code/domain")
   @GetMapping("/search")
-  public ResponseEntity<PagedResponse<SearchStoreResponse>> searchStores(
+  public ResponseEntity<PagedResponse<StoreSearchResponse>> searchStores(
       @PathVariable String orgId,
       @RequestParam(name = "websiteId", required = false) String websiteId,
       @RequestParam(name = "code", required = false) String code,
@@ -69,7 +70,7 @@ public class StoreController {
 
   @Operation(summary = "Get website by id")
   @GetMapping("/{websiteId}")
-  public ResponseEntity<SearchStoreResponse> getStoreById(
+  public ResponseEntity<StoreResponse> getStoreById(
       @PathVariable String orgId, @PathVariable String websiteId) {
     // TODO: Implement service layer
     return ResponseEntity.ok().build();
@@ -77,20 +78,20 @@ public class StoreController {
 
   @Operation(summary = "Update website (full replace)")
   @PutMapping("/{websiteId}")
-  public ResponseEntity<UpdateStoreResponse> updateStore(
+  public ResponseEntity<StoreUpdateResponse> updateStore(
       @PathVariable String orgId,
       @PathVariable String websiteId,
-      @RequestBody UpdateStoreRequest request) {
+      @RequestBody StoreUpdateRequest request) {
     // TODO: Implement service layer
     return ResponseEntity.ok().build();
   }
 
   @Operation(summary = "Update website (partial)")
   @PatchMapping("/{websiteId}")
-  public ResponseEntity<PatchStoreResponse> patchStore(
+  public ResponseEntity<StorePatchResponse> patchStore(
       @PathVariable String orgId,
       @PathVariable String websiteId,
-      @RequestBody PatchStoreRequest request) {
+      @RequestBody StorePatchRequest request) {
     // TODO: Implement service layer
     return ResponseEntity.ok().build();
   }

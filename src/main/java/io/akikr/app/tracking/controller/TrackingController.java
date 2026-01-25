@@ -2,13 +2,14 @@ package io.akikr.app.tracking.controller;
 
 import io.akikr.app.shared.PagedResponse;
 import io.akikr.app.tracking.model.TrackingStatus;
-import io.akikr.app.tracking.model.request.CreateTrackingRequest;
-import io.akikr.app.tracking.model.request.PatchTrackingRequest;
-import io.akikr.app.tracking.model.request.UpdateTrackingRequest;
-import io.akikr.app.tracking.model.response.CreateTrackingResponse;
-import io.akikr.app.tracking.model.response.PatchTrackingResponse;
-import io.akikr.app.tracking.model.response.SearchTrackingResponse;
-import io.akikr.app.tracking.model.response.UpdateTrackingResponse;
+import io.akikr.app.tracking.model.request.TrackingCreateRequest;
+import io.akikr.app.tracking.model.request.TrackingPatchRequest;
+import io.akikr.app.tracking.model.request.TrackingUpdateRequest;
+import io.akikr.app.tracking.model.response.TrackingCreateResponse;
+import io.akikr.app.tracking.model.response.TrackingPatchResponse;
+import io.akikr.app.tracking.model.response.TrackingResponse;
+import io.akikr.app.tracking.model.response.TrackingSearchResponse;
+import io.akikr.app.tracking.model.response.TrackingUpdateResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -30,15 +31,15 @@ public class TrackingController {
 
   @Operation(summary = "Create tracking for a fulfillment")
   @PostMapping
-  public ResponseEntity<CreateTrackingResponse> createTracking(
-      @PathVariable String fulfillmentId, @RequestBody CreateTrackingRequest request) {
+  public ResponseEntity<TrackingCreateResponse> createTracking(
+      @PathVariable String fulfillmentId, @RequestBody TrackingCreateRequest request) {
     // TODO: Implement service layer
     return ResponseEntity.ok().build();
   }
 
   @Operation(summary = "List/search tracking for a fulfillment (date range + pagination)")
   @GetMapping
-  public ResponseEntity<PagedResponse<SearchTrackingResponse>> listTracking(
+  public ResponseEntity<PagedResponse<TrackingSearchResponse>> listTracking(
       @PathVariable String fulfillmentId,
       @RequestParam(name = "from", required = false) String fromDate,
       @RequestParam(name = "to", required = false) String toDate,
@@ -54,7 +55,7 @@ public class TrackingController {
 
   @Operation(summary = "Search tracking by trackingNumber (within fulfillment)")
   @GetMapping("/search")
-  public ResponseEntity<PagedResponse<SearchTrackingResponse>> searchTrackingByNumber(
+  public ResponseEntity<PagedResponse<TrackingSearchResponse>> searchTrackingByNumber(
       @PathVariable String fulfillmentId,
       @RequestParam(name = "trackingNumber") String trackingNumber,
       @RequestParam(name = "carrier", required = false) String carrier,
@@ -66,7 +67,7 @@ public class TrackingController {
 
   @Operation(summary = "Get tracking by id")
   @GetMapping("/{trackingId}")
-  public ResponseEntity<SearchTrackingResponse> getTrackingById(
+  public ResponseEntity<TrackingResponse> getTrackingById(
       @PathVariable String fulfillmentId, @PathVariable String trackingId) {
     // TODO: Implement service layer
     return ResponseEntity.ok().build();
@@ -74,20 +75,20 @@ public class TrackingController {
 
   @Operation(summary = "Update tracking (full replace)")
   @PutMapping("/{trackingId}")
-  public ResponseEntity<UpdateTrackingResponse> updateTracking(
+  public ResponseEntity<TrackingUpdateResponse> updateTracking(
       @PathVariable String fulfillmentId,
       @PathVariable String trackingId,
-      @RequestBody UpdateTrackingRequest request) {
+      @RequestBody TrackingUpdateRequest request) {
     // TODO: Implement service layer
     return ResponseEntity.ok().build();
   }
 
   @Operation(summary = "Update tracking (partial)")
   @PatchMapping("/{trackingId}")
-  public ResponseEntity<PatchTrackingResponse> patchTracking(
+  public ResponseEntity<TrackingPatchResponse> patchTracking(
       @PathVariable String fulfillmentId,
       @PathVariable String trackingId,
-      @RequestBody PatchTrackingRequest request) {
+      @RequestBody TrackingPatchRequest request) {
     // TODO: Implement service layer
     return ResponseEntity.ok().build();
   }

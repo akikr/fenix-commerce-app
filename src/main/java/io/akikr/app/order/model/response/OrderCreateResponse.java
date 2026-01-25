@@ -7,7 +7,7 @@ import io.akikr.app.order.model.OrderStatus;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record CreateOrderResponse(
+public record OrderCreateResponse(
     @JsonProperty("id") String id,
     @JsonProperty("orgId") String orgId,
     @JsonProperty("websiteId") String websiteId,

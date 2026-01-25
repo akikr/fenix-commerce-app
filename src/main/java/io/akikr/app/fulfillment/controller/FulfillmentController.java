@@ -1,13 +1,14 @@
 package io.akikr.app.fulfillment.controller;
 
 import io.akikr.app.fulfillment.model.FulfillmentStatus;
-import io.akikr.app.fulfillment.model.request.CreateFulfillmentRequest;
-import io.akikr.app.fulfillment.model.request.PatchFulfillmentRequest;
-import io.akikr.app.fulfillment.model.request.UpdateFulfillmentRequest;
-import io.akikr.app.fulfillment.model.response.CreateFulfillmentResponse;
-import io.akikr.app.fulfillment.model.response.PatchFulfillmentResponse;
-import io.akikr.app.fulfillment.model.response.SearchFulfillmentResponse;
-import io.akikr.app.fulfillment.model.response.UpdateFulfillmentResponse;
+import io.akikr.app.fulfillment.model.request.FulfillmentCreateRequest;
+import io.akikr.app.fulfillment.model.request.FulfillmentPatchRequest;
+import io.akikr.app.fulfillment.model.request.FulfillmentUpdateRequest;
+import io.akikr.app.fulfillment.model.response.FulfillmentCreateResponse;
+import io.akikr.app.fulfillment.model.response.FulfillmentPatchResponse;
+import io.akikr.app.fulfillment.model.response.FulfillmentResponse;
+import io.akikr.app.fulfillment.model.response.FulfillmentSearchResponse;
+import io.akikr.app.fulfillment.model.response.FulfillmentUpdateResponse;
 import io.akikr.app.shared.PagedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,15 +31,15 @@ public class FulfillmentController {
 
   @Operation(summary = "Create fulfillment for an order")
   @PostMapping
-  public ResponseEntity<CreateFulfillmentResponse> createFulfillment(
-      @PathVariable String orderId, @RequestBody CreateFulfillmentRequest request) {
+  public ResponseEntity<FulfillmentCreateResponse> createFulfillment(
+      @PathVariable String orderId, @RequestBody FulfillmentCreateRequest request) {
     // TODO: Implement service layer
     return ResponseEntity.ok().build();
   }
 
   @Operation(summary = "List/search fulfillments for an order (date range + pagination)")
   @GetMapping
-  public ResponseEntity<PagedResponse<SearchFulfillmentResponse>> listFulfillments(
+  public ResponseEntity<PagedResponse<FulfillmentSearchResponse>> listFulfillments(
       @PathVariable String orderId,
       @RequestParam(name = "from", required = false) String fromDate,
       @RequestParam(name = "to", required = false) String toDate,
@@ -53,7 +54,7 @@ public class FulfillmentController {
 
   @Operation(summary = "Search fulfillment by external fulfillment id")
   @GetMapping("/search")
-  public ResponseEntity<PagedResponse<SearchFulfillmentResponse>> searchFulfillmentsByExternal(
+  public ResponseEntity<PagedResponse<FulfillmentSearchResponse>> searchFulfillmentsByExternal(
       @PathVariable String orderId,
       @RequestParam(name = "externalFulfillmentId") String externalFulfillmentId,
       @RequestParam(name = "page", defaultValue = "0") int page,
@@ -64,7 +65,7 @@ public class FulfillmentController {
 
   @Operation(summary = "Get fulfillment by id")
   @GetMapping("/{fulfillmentId}")
-  public ResponseEntity<SearchFulfillmentResponse> getFulfillmentById(
+  public ResponseEntity<FulfillmentResponse> getFulfillmentById(
       @PathVariable String orderId, @PathVariable String fulfillmentId) {
     // TODO: Implement service layer
     return ResponseEntity.ok().build();
@@ -72,20 +73,20 @@ public class FulfillmentController {
 
   @Operation(summary = "Update fulfillment (full replace)")
   @PutMapping("/{fulfillmentId}")
-  public ResponseEntity<UpdateFulfillmentResponse> updateFulfillment(
+  public ResponseEntity<FulfillmentUpdateResponse> updateFulfillment(
       @PathVariable String orderId,
       @PathVariable String fulfillmentId,
-      @RequestBody UpdateFulfillmentRequest request) {
+      @RequestBody FulfillmentUpdateRequest request) {
     // TODO: Implement service layer
     return ResponseEntity.ok().build();
   }
 
   @Operation(summary = "Update fulfillment (partial)")
   @PatchMapping("/{fulfillmentId}")
-  public ResponseEntity<PatchFulfillmentResponse> patchFulfillment(
+  public ResponseEntity<FulfillmentPatchResponse> patchFulfillment(
       @PathVariable String orderId,
       @PathVariable String fulfillmentId,
-      @RequestBody PatchFulfillmentRequest request) {
+      @RequestBody FulfillmentPatchRequest request) {
     // TODO: Implement service layer
     return ResponseEntity.ok().build();
   }

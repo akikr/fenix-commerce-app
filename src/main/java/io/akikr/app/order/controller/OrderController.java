@@ -3,14 +3,14 @@ package io.akikr.app.order.controller;
 import io.akikr.app.order.model.FinancialStatus;
 import io.akikr.app.order.model.FulfillmentStatus;
 import io.akikr.app.order.model.OrderStatus;
-import io.akikr.app.order.model.request.CreateOrderRequest;
-import io.akikr.app.order.model.request.PatchOrderRequest;
-import io.akikr.app.order.model.request.UpdateOrderRequest;
-import io.akikr.app.order.model.response.CreateOrderResponse;
+import io.akikr.app.order.model.request.OrderCreateRequest;
+import io.akikr.app.order.model.request.OrderPatchRequest;
+import io.akikr.app.order.model.request.OrderUpdateRequest;
+import io.akikr.app.order.model.response.OrderCreateResponse;
+import io.akikr.app.order.model.response.OrderPatchResponse;
 import io.akikr.app.order.model.response.OrderResponse;
-import io.akikr.app.order.model.response.PatchOrderResponse;
-import io.akikr.app.order.model.response.SearchOrderResponse;
-import io.akikr.app.order.model.response.UpdateOrderResponse;
+import io.akikr.app.order.model.response.OrderSearchResponse;
+import io.akikr.app.order.model.response.OrderUpdateResponse;
 import io.akikr.app.shared.PagedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,14 +33,14 @@ public class OrderController {
 
   @Operation(summary = "Create (or upsert) order")
   @PostMapping
-  public ResponseEntity<CreateOrderResponse> createOrder(@RequestBody CreateOrderRequest request) {
+  public ResponseEntity<OrderCreateResponse> createOrder(@RequestBody OrderCreateRequest request) {
     // TODO: Implement service layer
     return ResponseEntity.ok().build();
   }
 
   @Operation(summary = "Search orders (date range + pagination)")
   @GetMapping
-  public ResponseEntity<PagedResponse<SearchOrderResponse>> searchOrders(
+  public ResponseEntity<PagedResponse<OrderSearchResponse>> searchOrders(
       @RequestParam(name = "orgId") String orgId,
       @RequestParam(name = "websiteId", required = false) String websiteId,
       @RequestParam(name = "from", required = false) String fromDate,
@@ -58,7 +58,7 @@ public class OrderController {
 
   @Operation(summary = "Search order by external order id/number")
   @GetMapping("/search")
-  public ResponseEntity<PagedResponse<SearchOrderResponse>> searchOrderByExternal(
+  public ResponseEntity<PagedResponse<OrderSearchResponse>> searchOrderByExternal(
       @RequestParam(name = "orgId") String orgId,
       @RequestParam(name = "websiteId", required = false) String websiteId,
       @RequestParam(name = "externalOrderId", required = false) String externalOrderId,
@@ -78,16 +78,16 @@ public class OrderController {
 
   @Operation(summary = "Update order (full replace)")
   @PutMapping("/{orderId}")
-  public ResponseEntity<UpdateOrderResponse> updateOrder(
-      @PathVariable String orderId, @RequestBody UpdateOrderRequest request) {
+  public ResponseEntity<OrderUpdateResponse> updateOrder(
+      @PathVariable String orderId, @RequestBody OrderUpdateRequest request) {
     // TODO: Implement service layer
     return ResponseEntity.ok().build();
   }
 
   @Operation(summary = "Update order (partial)")
   @PatchMapping("/{orderId}")
-  public ResponseEntity<PatchOrderResponse> patchOrder(
-      @PathVariable String orderId, @RequestBody PatchOrderRequest request) {
+  public ResponseEntity<OrderPatchResponse> patchOrder(
+      @PathVariable String orderId, @RequestBody OrderPatchRequest request) {
     // TODO: Implement service layer
     return ResponseEntity.ok().build();
   }

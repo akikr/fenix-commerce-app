@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-public record CreateFulfillmentRequest(
+public record FulfillmentCreateRequest(
     @NotNull(message = "externalFulfillmentId cannot be NULL") @NotBlank(message = "externalFulfillmentId cannot be Blank") @JsonProperty("externalFulfillmentId")
         String externalFulfillmentId,
     @NotNull(

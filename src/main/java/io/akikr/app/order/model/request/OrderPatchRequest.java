@@ -1,17 +1,14 @@
-package io.akikr.app.order.model.response;
+package io.akikr.app.order.model.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.akikr.app.order.model.FinancialStatus;
 import io.akikr.app.order.model.FulfillmentStatus;
 import io.akikr.app.order.model.OrderStatus;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record PatchOrderResponse(
-    @JsonProperty("id") String id,
-    @JsonProperty("orgId") String orgId,
-    @JsonProperty("websiteId") String websiteId,
-    @JsonProperty("externalOrderId") String externalOrderId,
+public record OrderPatchRequest(
     @JsonProperty("externalOrderNumber") String externalOrderNumber,
     @JsonProperty("status") OrderStatus status,
     @JsonProperty("financialStatus") FinancialStatus financialStatus,
@@ -19,8 +16,7 @@ public record PatchOrderResponse(
     @JsonProperty("customerEmail") String customerEmail,
     @JsonProperty("orderTotal") BigDecimal orderTotal,
     @JsonProperty("currency") String currency,
-    @JsonProperty("orderCreatedAt") LocalDateTime orderCreatedAt,
-    @JsonProperty("orderUpdatedAt") LocalDateTime orderUpdatedAt,
-    @JsonProperty("ingestedAt") LocalDateTime ingestedAt,
-    @JsonProperty("createdAt") LocalDateTime createdAt,
-    @JsonProperty("updatedAt") LocalDateTime updatedAt) {}
+    @NotNull(message = "orderCreatedAt cannot be NULL") @JsonProperty("orderCreatedAt")
+        LocalDateTime orderCreatedAt,
+    @NotNull(message = "orderUpdatedAt cannot be NULL") @JsonProperty("orderUpdatedAt")
+        LocalDateTime orderUpdatedAt) {}

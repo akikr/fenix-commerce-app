@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-public record CreateTrackingRequest(
+public record TrackingUpdateRequest(
     @NotNull(message = "trackingNumber cannot be NULL") @NotBlank(message = "trackingNumber cannot be Blank") @JsonProperty("trackingNumber")
         String trackingNumber,
     @NotNull(message = "carrier cannot be NULL") @NotBlank(message = "carrier cannot be Blank") @JsonProperty("carrier")

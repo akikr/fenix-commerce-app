@@ -6,7 +6,7 @@ import io.akikr.app.store.model.StoreStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record CreateStoreRequest(
+public record StoreUpdateRequest(
     @NotNull(message = "code cannot be NULL") @NotBlank(message = "code cannot be Blank") @JsonProperty("code")
         String code,
     @NotNull(message = "name cannot be NULL") @NotBlank(message = "name cannot be Blank") @JsonProperty("name")

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.akikr.app.fulfillment.model.FulfillmentStatus;
 import java.time.LocalDateTime;
 
-public record SearchFulfillmentResponse(
+public record FulfillmentSearchResponse(
     @JsonProperty("id") String id,
     @JsonProperty("orderId") String orderId,
     @JsonProperty("externalFulfillmentId") String externalFulfillmentId,

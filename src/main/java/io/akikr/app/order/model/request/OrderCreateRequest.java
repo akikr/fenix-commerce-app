@@ -11,7 +11,7 @@ import jakarta.validation.constraints.Pattern;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record UpdateOrderRequest(
+public record OrderCreateRequest(
     @NotNull(message = "orgId cannot be NULL") @NotBlank(message = "orgId cannot be Blank") @JsonProperty("orgId")
         String orgId,
     @NotNull(message = "websiteId cannot be NULL") @NotBlank(message = "websiteId cannot be Blank") @JsonProperty("websiteId")

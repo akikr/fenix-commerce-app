@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.akikr.app.tracking.model.TrackingStatus;
 import java.time.LocalDateTime;
 
-public record UpdateTrackingResponse(
+public record TrackingUpdateResponse(
     @JsonProperty("id") String id,
     @JsonProperty("fulfillmentId") String fulfillmentId,
     @JsonProperty("trackingNumber") String trackingNumber,

@@ -5,7 +5,7 @@ import io.akikr.app.store.model.StorePlatform;
 import io.akikr.app.store.model.StoreStatus;
 import java.time.LocalDateTime;
 
-public record PatchStoreResponse(
+public record StoreCreateResponse(
     @JsonProperty("id") String id,
     @JsonProperty("orgId") String orgId,
     @JsonProperty("code") String code,
