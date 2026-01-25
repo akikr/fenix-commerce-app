@@ -8,4 +8,5 @@ import jakarta.validation.constraints.NotNull;
 public record TenantUpdateRequest(
     @NotNull(message = "Name cannot be NULL") @NotBlank(message = "Name cannot be Blank") @JsonProperty(value = "name")
         String name,
-    @JsonProperty(value = "status") TenantStatus status) {}
+    @NotNull(message = "Status cannot be null. Possible values:  ACTIVE, INACTIVE") @JsonProperty(value = "status")
+        TenantStatus status) {}
