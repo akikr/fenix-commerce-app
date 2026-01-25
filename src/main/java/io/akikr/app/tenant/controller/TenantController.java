@@ -37,14 +37,14 @@ public class TenantController {
     this.tenantService = tenantService;
   }
 
-  @Operation(method = "Create organization")
+  @Operation(summary = "Create organization")
   @PostMapping
   public ResponseEntity<TenantCreateResponse> createTenant(
       @RequestBody TenantCreateRequest request) {
     return tenantService.createTenant(request);
   }
 
-  @Operation(method = "Search organizations (date range + pagination)")
+  @Operation(summary = "Search organizations (date range + pagination)")
   @GetMapping
   public ResponseEntity<PagedResponse<TenantSearchResponse>> searchTenants(
       @RequestParam(name = "from", required = false) String fromDate,
@@ -58,7 +58,7 @@ public class TenantController {
         fromDate, toDate, page, size, sort, tenantStatus, tenantName);
   }
 
-  @Operation(method = "Search organizations by external-id")
+  @Operation(summary = "Search organizations by external-id")
   @GetMapping(path = "/search")
   public ResponseEntity<PagedResponse<TenantSearchResponse>> searchTenantsByExternalId(
       @RequestParam(name = "externalId") String externalId,
@@ -67,27 +67,27 @@ public class TenantController {
     return tenantService.searchTenantsByExternalId(externalId, page, size);
   }
 
-  @Operation(method = "Get organization by id")
+  @Operation(summary = "Get organization by id")
   @GetMapping(path = "/{id}")
   public ResponseEntity<TenantResponse> getTenantById(@PathVariable String id) {
     return tenantService.getTenantById(id);
   }
 
-  @Operation(method = "Update organization (full replace)")
+  @Operation(summary = "Update organization (full replace)")
   @PutMapping(path = "/{id}")
   public ResponseEntity<TenantUpdateResponse> updateTenant(
       @PathVariable String id, @RequestBody TenantUpdateRequest request) {
     return tenantService.updateTenant(id, request);
   }
 
-  @Operation(method = "Update organization (partial)")
+  @Operation(summary = "Update organization (partial)")
   @PatchMapping(path = "/{id}")
   public ResponseEntity<TenantPatchResponse> patchTenant(
       @PathVariable String id, @RequestBody TenantPatchRequest request) {
     return tenantService.patchTenant(id, request);
   }
 
-  @Operation(method = "Delete organization (soft delete/deactivate)")
+  @Operation(summary = "Delete organization (soft delete/deactivate)")
   @DeleteMapping(path = "/{id}")
   public ResponseEntity<Void> deleteTenant(@PathVariable String id) {
     return tenantService.deleteTenant(id);
