@@ -99,8 +99,8 @@ public class Order {
     return "Order{"
         + "orderId="
         + orderId
-        + ", tenant="
-        + tenant
+        + ", tenantId="
+        + tenant.getTenantId()
         + ", storeId="
         + store.getStoreId()
         + ", externalOrderId='"
