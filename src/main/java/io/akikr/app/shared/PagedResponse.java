@@ -14,7 +14,6 @@ import java.util.List;
  * @param totalPages The total number of pages.
  * @param hasNextPage A boolean indicating if there is a next page.
  */
-
 public record PagedResponse<T>(
     @JsonProperty("data") List<T> data,
     @JsonProperty("page") int page,

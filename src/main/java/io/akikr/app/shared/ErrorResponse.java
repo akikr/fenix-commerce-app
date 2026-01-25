@@ -11,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @param message A more detailed message about the error.
  * @param path The path where the error occurred.
  */
-
 public record ErrorResponse(
     @JsonProperty(value = "timestamp") String timestamp,
     @JsonProperty(value = "status") int statusCode,

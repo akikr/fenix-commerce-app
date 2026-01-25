@@ -23,7 +23,6 @@ import org.springframework.core.env.Environment;
  * first API docs request), this makes the lazy behavior of the configuration beans themselves
  * explicit.
  */
-
 @Lazy
 @Configuration(proxyBeanMethods = false)
 public class OpenApiConfig {
