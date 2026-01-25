@@ -13,15 +13,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 
-/// ### Configuration for OpenAPI documentation
-///
-/// This configuration is marked as @Lazy to ensure that these beans are not instantiated until they
-/// are first requested.
-///
-/// - Note: While springdoc-openapi is already lazy by default (deferring heavy processing until the
-/// first API docs request), this makes the lazy behavior of the configuration beans themselves
-/// explicit.
-///
+/**
+ * Configuration for OpenAPI documentation.
+ *
+ * <p>This configuration is marked as {@code @Lazy} to ensure that these beans are not instantiated
+ * until they are first requested.
+ *
+ * <p>Note: While springdoc-openapi is already lazy by default (deferring heavy processing until the
+ * first API docs request), this makes the lazy behavior of the configuration beans themselves
+ * explicit.
+ */
 
 @Lazy
 @Configuration(proxyBeanMethods = false)

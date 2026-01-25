@@ -14,6 +14,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
+
+/**
+ * A filter that logs the request and response bodies for debugging purposes.
+ * <p>
+ * It uses {@link ContentCachingRequestWrapper} and {@link ContentCachingResponseWrapper}
+ * to capture the content of the request and response.
+ * Logging behavior is controlled by {@link AppLoggingProperties}.
+ * </p>
+ */
+
 @Component
 public class AppLoggingFilter extends GenericFilter {
 
