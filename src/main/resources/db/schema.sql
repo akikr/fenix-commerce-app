@@ -8,7 +8,7 @@
 --  - InnoDB + utf8mb4
 -- ============================================================
 
--- Create Database Tables if not exists for Application setup
+-- Create Database Tables if not exists for TestContainer setup
 
 -- Set session configuration
 SET sql_mode = 'STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
@@ -258,59 +258,7 @@ CREATE TABLE tracking_events (
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- ============================================================
--- 3) INSERT DUMMY DATA
--- ============================================================
-
--- Insert tenants
-INSERT INTO tenant (tenant_id, tenant_name, status)
-VALUES
-    ( UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440001', 1), 'ACME Corporation', 'ACTIVE'),
-    ( UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440002', 1), 'TechStore Inc', 'INACTIVE'),
-    ( UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440003', 1), 'Fashion Hub', 'ACTIVE');
-
--- Insert stores for tenants
-INSERT INTO store (store_id, tenant_id, store_code, store_name, platform, currency, status)
-VALUES
-    (UUID_TO_BIN('a1b2c3d4-e5f6-7890-1234-567890abcdef', 1), UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440001', 1), 'ACME-001', 'ACME Main Store', 'SHOPIFY', 'USD', 'ACTIVE'),
-    (UUID_TO_BIN('b2c3d4e5-f6a7-8901-2345-67890abcdef0', 1), UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440003', 1), 'FH-001', 'Fashion Hub Boutique', 'MAGENTO', 'EUR', 'ACTIVE');
-
--- Insert orders
-INSERT INTO orders (order_id, tenant_id, store_id, external_order_id, external_order_number, order_status, financial_status, fulfillment_status, customer_email, order_total_amount, currency, order_created_at)
-VALUES
-    (UUID_TO_BIN('c3d4e5f6-a7b8-9012-3456-7890abcdef01', 1), UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440001', 1), UUID_TO_BIN('a1b2c3d4-e5f6-7890-1234-567890abcdef', 1), 'EXT-ORD-001', '1001', 'CREATED', 'PAID', 'UNFULFILLED', 'customer1@example.com', 150.75, 'USD', NOW()),
-    (UUID_TO_BIN('d4e5f6a7-b8c9-0123-4567-890abcdef012', 1), UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440003', 1), UUID_TO_BIN('b2c3d4e5-f6a7-8901-2345-67890abcdef0', 1), 'EXT-ORD-002', '2001', 'CREATED', 'PENDING', 'UNFULFILLED', 'customer2@example.com', 200.00, 'EUR', NOW());
-
--- Insert order items
-INSERT INTO order_items (order_item_id, tenant_id, order_id, external_line_item_id, sku, title, quantity_ordered, unit_price)
-VALUES
-    (UUID_TO_BIN('11223344-5566-7788-99aa-bbccddeeff00', 1), UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440001', 1), UUID_TO_BIN('c3d4e5f6-a7b8-9012-3456-7890abcdef01', 1), 'LINE-001', 'SKU-A-123', 'Product A', 1, 150.75),
-    (UUID_TO_BIN('22334455-6677-8899-aabb-ccddeeff0011', 1), UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440003', 1), UUID_TO_BIN('d4e5f6a7-b8c9-0123-4567-890abcdef012', 1), 'LINE-002', 'SKU-B-456', 'Product B', 2, 100.00);
-
--- Insert fulfillments
-INSERT INTO fulfillments (fulfillment_id, tenant_id, order_id, external_fulfillment_id, fulfillment_status, carrier, service_level)
-VALUES
-    (UUID_TO_BIN('e5f6a7b8-c9d0-1234-5678-90abcdef0123', 1), UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440001', 1), UUID_TO_BIN('c3d4e5f6-a7b8-9012-3456-7890abcdef01', 1), 'EXT-FUL-001', 'CREATED', 'UPS', 'Standard');
-
--- Insert tracking
-INSERT INTO tracking (tracking_id, tenant_id, fulfillment_id, tracking_number, tracking_status, is_primary)
-VALUES
-    (UUID_TO_BIN('f6a7b8c9-d0e1-2345-6789-0abcdef01234', 1), UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440001', 1), UUID_TO_BIN('e5f6a7b8-c9d0-1234-5678-90abcdef0123', 1), '1Z999AA10123456784', 'LABEL_CREATED', TRUE);
-
--- Insert tracking events
-INSERT INTO tracking_events (tracking_event_id, tenant_id, tracking_id, event_time, event_code, event_description, event_city, event_state, event_country, event_zip, source, event_hash)
-VALUES
-    (UUID_TO_BIN('aabbccdd-eeff-0011-2233-445566778899', 1), UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440001', 1), UUID_TO_BIN('f6a7b8c9-d0e1-2345-6789-0abcdef01234', 1), NOW(), 'LC', 'Label Created', 'Atlanta', 'GA', 'USA', '30303', 'CARRIER', SHA2('1Z999AA10123456784-LC', 256));
 
 -- ============================================================
--- 4) VERIFICATION QUERIES
--- ============================================================
-
--- Verify tenant count
-SELECT COUNT(*) AS total_tenants FROM tenant WHERE status = 'ACTIVE';
-
-SELECT COUNT(*) AS total_tenants FROM tenant WHERE status = 'INACTIVE';
-
--- ============================================================
--- END OF INITIALIZATION SCRIPT
+-- End of Fenix Commerce Database Tables Initialization Script
 -- ============================================================
