@@ -108,6 +108,7 @@ The project follows a standard Maven project structure:
 │   │   │       ├── tenant/         # Domain-related packages for organizations/tenants
 │   │   │       │   ├── controller/ # REST controllers
 │   │   │       │   ├── service/    # Business logic
+│   │   │       │   ├── processor/  # Data processing layer
 │   │   │       │   ├── repository/ # Data access layer
 │   │   │       │   ├── entity/     # JPA entities
 │   │   │       │   └── model/      # DTOs and other models

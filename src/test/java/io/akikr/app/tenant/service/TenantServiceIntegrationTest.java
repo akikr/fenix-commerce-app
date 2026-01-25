@@ -13,6 +13,7 @@ import io.akikr.app.tenant.model.TenantStatus;
 import io.akikr.app.tenant.model.request.TenantCreateRequest;
 import io.akikr.app.tenant.model.request.TenantPatchRequest;
 import io.akikr.app.tenant.model.request.TenantUpdateRequest;
+import io.akikr.app.tenant.processor.TenantProcessor;
 import io.akikr.app.tenant.repository.TenantRepository;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -36,7 +37,7 @@ public class TenantServiceIntegrationTest extends MySqlTestContainer {
 
   @BeforeEach
   void setUp() {
-    tenantService = new TenantServiceImpl(tenantRepository);
+    tenantService = new TenantServiceImpl(new TenantProcessor(tenantRepository));
     tenantRepository.deleteAll();
 
     activeTenantId = UUID.randomUUID();

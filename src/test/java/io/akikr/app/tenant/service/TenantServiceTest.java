@@ -15,7 +15,7 @@ import io.akikr.app.tenant.model.TenantStatus;
 import io.akikr.app.tenant.model.request.TenantCreateRequest;
 import io.akikr.app.tenant.model.request.TenantPatchRequest;
 import io.akikr.app.tenant.model.request.TenantUpdateRequest;
-import io.akikr.app.tenant.repository.TenantRepository;
+import io.akikr.app.tenant.processor.TenantProcessor;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
@@ -37,7 +37,7 @@ import org.springframework.http.ResponseEntity;
 @ExtendWith(MockitoExtension.class)
 class TenantServiceTest {
 
-  @Mock private TenantRepository tenantRepository;
+  @Mock private TenantProcessor tenantProcessor;
 
   @InjectMocks private TenantServiceImpl tenantService;
 
@@ -64,7 +64,7 @@ class TenantServiceTest {
     // Arrange
     TenantCreateRequest request =
         new TenantCreateRequest(tenantId.toString(), "test-tenant", TenantStatus.ACTIVE);
-    when(tenantRepository.save(any(Tenant.class))).thenReturn(tenant);
+    when(tenantProcessor.saveTenant(any(Tenant.class))).thenReturn(tenant);
 
     // Act
     var responseEntity = tenantService.createTenant(request);
@@ -86,7 +86,7 @@ class TenantServiceTest {
         new TenantCreateRequest(tenantId.toString(), "test-tenant", TenantStatus.ACTIVE);
 
     // Mock
-    when(tenantRepository.save(any(Tenant.class)))
+    when(tenantProcessor.saveTenant(any(Tenant.class)))
         .thenThrow(new IllegalArgumentException("Invalid data"));
 
     // Act & Assert
@@ -99,7 +99,7 @@ class TenantServiceTest {
   void testSearchTenants_Success() {
     // Arrange
     Page<Tenant> tenantPage = new PageImpl<>(Collections.singletonList(tenant));
-    when(tenantRepository.findAll(any(Specification.class), any(PageRequest.class)))
+    when(tenantProcessor.findBySpecification(any(Specification.class), any(PageRequest.class)))
         .thenReturn(tenantPage);
 
     // Act
@@ -115,7 +115,7 @@ class TenantServiceTest {
   @DisplayName("Test searchTenants - Failure")
   void testSearchTenants_Failure() {
     // Arrange
-    when(tenantRepository.findAll(any(Specification.class), any(PageRequest.class)))
+    when(tenantProcessor.findBySpecification(any(Specification.class), any(PageRequest.class)))
         .thenThrow(new IllegalArgumentException("DB errorDetails"));
 
     // Act & Assert
@@ -129,7 +129,7 @@ class TenantServiceTest {
   @DisplayName("Test getTenantById - Success")
   void testGetTenantById_Success() {
     // Arrange
-    when(tenantRepository.findByTenantId(tenantId)).thenReturn(Optional.of(tenant));
+    when(tenantProcessor.findByTenantId(tenantId)).thenReturn(Optional.of(tenant));
 
     // Act
     var responseEntity = tenantService.getTenantById(tenantId.toString());
@@ -146,7 +146,7 @@ class TenantServiceTest {
   @DisplayName("Test getTenantById - Not Found")
   void testGetTenantById_NotFound() {
     // Arrange
-    when(tenantRepository.findByTenantId(tenantId)).thenReturn(Optional.empty());
+    when(tenantProcessor.findByTenantId(tenantId)).thenReturn(Optional.empty());
 
     // Act & Assert
     assertThrowsExactly(
@@ -159,8 +159,8 @@ class TenantServiceTest {
   void testUpdateTenant_Success() {
     // Arrange
     TenantUpdateRequest request = new TenantUpdateRequest("updated-name", TenantStatus.INACTIVE);
-    when(tenantRepository.findByTenantId(tenantId)).thenReturn(Optional.of(tenant));
-    when(tenantRepository.save(any(Tenant.class))).thenReturn(tenant);
+    when(tenantProcessor.findByTenantId(tenantId)).thenReturn(Optional.of(tenant));
+    when(tenantProcessor.saveTenant(any(Tenant.class))).thenReturn(tenant);
 
     // Act
     var responseEntity = tenantService.updateTenant(tenantId.toString(), request);
@@ -177,7 +177,7 @@ class TenantServiceTest {
   void testUpdateTenant_NotFound() {
     // Arrange
     TenantUpdateRequest request = new TenantUpdateRequest("updated-name", TenantStatus.INACTIVE);
-    when(tenantRepository.findByTenantId(tenantId)).thenReturn(Optional.empty());
+    when(tenantProcessor.findByTenantId(tenantId)).thenReturn(Optional.empty());
 
     // Act and Assert
     assertThrows(
@@ -190,8 +190,8 @@ class TenantServiceTest {
   void testPatchTenant_Success() {
     // Arrange
     TenantPatchRequest request = new TenantPatchRequest("patched-name", TenantStatus.ACTIVE);
-    when(tenantRepository.findByTenantId(tenantId)).thenReturn(Optional.of(tenant));
-    when(tenantRepository.save(any(Tenant.class))).thenReturn(tenant);
+    when(tenantProcessor.findByTenantId(tenantId)).thenReturn(Optional.of(tenant));
+    when(tenantProcessor.saveTenant(any(Tenant.class))).thenReturn(tenant);
 
     // Act
     var responseEntity = tenantService.patchTenant(tenantId.toString(), request);
@@ -208,7 +208,7 @@ class TenantServiceTest {
   void testPatchTenant_NotFound() {
     // Arrange
     TenantPatchRequest request = new TenantPatchRequest("patched-name", null);
-    when(tenantRepository.findByTenantId(tenantId)).thenReturn(Optional.empty());
+    when(tenantProcessor.findByTenantId(tenantId)).thenReturn(Optional.empty());
 
     // Act & Assert
     assertThrows(
@@ -220,8 +220,8 @@ class TenantServiceTest {
   @DisplayName("Test deleteTenant - Success")
   void testDeleteTenant_Success() {
     // Arrange
-    when(tenantRepository.findById(tenantId)).thenReturn(Optional.of(tenant));
-    when(tenantRepository.save(any(Tenant.class))).thenReturn(tenant);
+    when(tenantProcessor.findByTenantId(tenantId)).thenReturn(Optional.of(tenant));
+    when(tenantProcessor.saveTenant(any(Tenant.class))).thenReturn(tenant);
 
     // Act
     ResponseEntity<?> responseEntity = tenantService.deleteTenant(tenantId.toString());
@@ -234,7 +234,7 @@ class TenantServiceTest {
   @DisplayName("Test deleteTenant - Not Found")
   void testDeleteTenant_NotFound() {
     // Arrange
-    when(tenantRepository.findById(tenantId)).thenReturn(Optional.empty());
+    when(tenantProcessor.findByTenantId(tenantId)).thenReturn(Optional.empty());
 
     // Act and Assert
     assertThrows(RuntimeException.class, () -> tenantService.deleteTenant(tenantId.toString()));

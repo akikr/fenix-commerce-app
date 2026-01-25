@@ -16,7 +16,7 @@ import io.akikr.app.tenant.model.response.TenantPatchResponse;
 import io.akikr.app.tenant.model.response.TenantResponse;
 import io.akikr.app.tenant.model.response.TenantSearchResponse;
 import io.akikr.app.tenant.model.response.TenantUpdateResponse;
-import io.akikr.app.tenant.repository.TenantRepository;
+import io.akikr.app.tenant.processor.TenantProcessor;
 import io.akikr.app.tenant.repository.TenantSpecifications;
 import java.time.ZoneOffset;
 import java.util.Objects;
@@ -30,21 +30,19 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TenantServiceImpl implements TenantService {
 
   private static final Logger log = LoggerFactory.getLogger(TenantServiceImpl.class);
 
-  private final TenantRepository tenantRepository;
+  private final TenantProcessor tenantProcessor;
 
-  public TenantServiceImpl(TenantRepository tenantRepository) {
-    this.tenantRepository = tenantRepository;
+  public TenantServiceImpl(TenantProcessor tenantProcessor) {
+    this.tenantProcessor = tenantProcessor;
   }
 
   @Override
-  @Transactional(rollbackFor = Exception.class)
   public ResponseEntity<TenantCreateResponse> createTenant(TenantCreateRequest request)
       throws TenantException {
     log.info(
@@ -56,7 +54,7 @@ public class TenantServiceImpl implements TenantService {
       log.debug("Saving tenant data as:[{}]", tenant);
 
       var savedTenant =
-          Objects.requireNonNull(tenantRepository.save(tenant), "Failed to save tenant");
+          Objects.requireNonNull(tenantProcessor.saveTenant(tenant), "Failed to save tenant");
       var tenantId = savedTenant.getTenantId();
       log.info("Tenant created successfully with Id:[{}]", tenantId);
       var response = toTenantCreateResponse(tenantId, savedTenant);
@@ -77,7 +75,6 @@ public class TenantServiceImpl implements TenantService {
   }
 
   @Override
-  @Transactional(readOnly = true)
   public ResponseEntity<PagedResponse<TenantSearchResponse>> searchTenants(
       @Nullable String fromDate,
       @Nullable String toDate,
@@ -102,7 +99,7 @@ public class TenantServiceImpl implements TenantService {
       var tenantSpecification =
           TenantSpecifications.withOptionalFilters(fromDate, toDate, tenantStatus, tenantName);
       log.debug("Constructed tenant specification as: [{}]", tenantSpecification);
-      var tenantPage = tenantRepository.findAll(tenantSpecification, pageable);
+      var tenantPage = tenantProcessor.findBySpecification(tenantSpecification, pageable);
       log.info(
           "Tenants search completed successfully with totalElements:[{}]",
           tenantPage.getTotalElements());
@@ -129,7 +126,6 @@ public class TenantServiceImpl implements TenantService {
   }
 
   @Override
-  @Transactional(readOnly = true)
   public ResponseEntity<PagedResponse<TenantSearchResponse>> searchTenantsByExternalId(
       String externalId, Integer page, Integer size) throws TenantException {
     log.info(
@@ -139,7 +135,8 @@ public class TenantServiceImpl implements TenantService {
         size);
     try {
       var pageable = PageRequest.of(page, size);
-      var tenantPage = tenantRepository.findByTenantId(UUID.fromString(externalId), pageable);
+      UUID tenantId = UUID.fromString(externalId);
+      var tenantPage = tenantProcessor.findByTenantId(tenantId, pageable);
       log.info(
           "Tenants search completed successfully for externalId:[{}] with totalElements:[{}]",
           externalId,
@@ -158,13 +155,13 @@ public class TenantServiceImpl implements TenantService {
   }
 
   @Override
-  @Transactional(readOnly = true)
   public ResponseEntity<TenantResponse> getTenantById(String id) throws TenantException {
     log.info("Fetching tenant for Id:[{}]", id);
     try {
+      UUID tenantId = UUID.fromString(id);
       var tenant =
-          tenantRepository
-              .findByTenantId(UUID.fromString(id))
+          tenantProcessor
+              .findByTenantId(tenantId)
               .map(TenantServiceImpl::toTenantDto)
               .orElseThrow(() -> new RuntimeException("No Tenant found with id: " + id));
       log.info("Tenant fetched successfully for Id:[{}]", id);
@@ -181,18 +178,18 @@ public class TenantServiceImpl implements TenantService {
   }
 
   @Override
-  @Transactional(rollbackFor = Exception.class)
   public ResponseEntity<TenantUpdateResponse> updateTenant(String id, TenantUpdateRequest request)
       throws TenantException {
     log.info("Updating tenant data for Id:[{}]", id);
     try {
       log.debug("Updating tenant data for Id:[{}] with updated data as:[{}]", id, request);
+      UUID tenantId = UUID.fromString(id);
       var tenant =
-          tenantRepository
-              .findByTenantId(UUID.fromString(id))
+          tenantProcessor
+              .findByTenantId(tenantId)
               .orElseThrow(() -> new RuntimeException("No Tenant found with id: " + id));
       var newTenant = toTenant(tenant.getTenantId(), request);
-      var updatedTenant = tenantRepository.save(newTenant);
+      var updatedTenant = tenantProcessor.saveTenant(newTenant);
       log.info("Tenant data updated successfully for Id:[{}]", id);
       var response = toTenantUpdateResponse(updatedTenant);
       return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -207,18 +204,17 @@ public class TenantServiceImpl implements TenantService {
   }
 
   @Override
-  @Transactional(rollbackFor = Exception.class)
   public ResponseEntity<TenantPatchResponse> patchTenant(String id, TenantPatchRequest request)
       throws TenantException {
     log.info("Updating partial tenant data for Id:[{}]", id);
     try {
       log.debug("Updating partial tenant data for Id:[{}] with data as:[{}]", id, request);
       var tenant =
-          tenantRepository
+          tenantProcessor
               .findByTenantId(UUID.fromString(id))
               .orElseThrow(() -> new RuntimeException("No Tenant found with id: " + id));
       var patchedTenant = buildTenant(request, tenant);
-      var updatedTenant = tenantRepository.save(patchedTenant);
+      var updatedTenant = tenantProcessor.saveTenant(patchedTenant);
       log.info("Tenant data (partiality) updated successfully for Id:[{}]", id);
       var response = toTenantPatchResponse(updatedTenant);
       return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -234,20 +230,20 @@ public class TenantServiceImpl implements TenantService {
   }
 
   @Override
-  @Transactional(rollbackFor = Exception.class)
   public ResponseEntity<Void> deleteTenant(String id) throws TenantException {
     log.info("Deactivating tenant for Id:[{}]", id);
     try {
+      UUID tenantId = UUID.fromString(id);
       var tenant =
-          tenantRepository
-              .findById(UUID.fromString(id))
+          tenantProcessor
+              .findByTenantId(tenantId)
               .orElseThrow(() -> new RuntimeException("No Tenant found with id: " + id));
       if (Status.INACTIVE.compareTo(tenant.getStatus()) == 0) {
         log.warn("Tenant is already INACTIVE for Id:[{}]", id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
       }
       tenant.setStatus(Status.INACTIVE);
-      var deactivatedTenant = tenantRepository.save(tenant);
+      var deactivatedTenant = tenantProcessor.saveTenant(tenant);
       log.info("Tenant deactivated successfully for Id:[{}]", deactivatedTenant.getTenantId());
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     } catch (NullPointerException | IllegalArgumentException e) {
