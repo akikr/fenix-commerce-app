@@ -40,5 +40,5 @@ public interface TenantService {
   ResponseEntity<TenantPatchResponse> patchTenant(String id, TenantPatchRequest request)
       throws TenantException;
 
-  ResponseEntity<Object> deleteTenant(String id) throws TenantException;
+  ResponseEntity<Void> deleteTenant(String id) throws TenantException;
 }

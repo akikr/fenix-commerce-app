@@ -235,7 +235,7 @@ public class TenantServiceImpl implements TenantService {
 
   @Override
   @Transactional(rollbackFor = Exception.class)
-  public ResponseEntity<Object> deleteTenant(String id) throws TenantException {
+  public ResponseEntity<Void> deleteTenant(String id) throws TenantException {
     log.info("Deactivating tenant for Id:[{}]", id);
     try {
       var tenant =

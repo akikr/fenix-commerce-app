@@ -89,7 +89,7 @@ public class TenantController {
 
   @Operation(method = "Delete organization (soft delete/deactivate)")
   @DeleteMapping(path = "/{id}")
-  public ResponseEntity<Object> deleteTenant(@PathVariable String id) {
+  public ResponseEntity<Void> deleteTenant(@PathVariable String id) {
     return tenantService.deleteTenant(id);
   }
 }
