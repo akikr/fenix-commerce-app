@@ -1,6 +1,7 @@
 package io.akikr.app.order.entity;
 
 import io.akikr.app.fulfillment.entity.Fulfillment;
+import io.akikr.app.store.entity.Store;
 import io.akikr.app.tenant.entity.Tenant;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -42,8 +43,9 @@ public class Order {
   @JoinColumn(name = "tenant_id", nullable = false)
   private Tenant tenant;
 
-  @Column(name = "store_id", nullable = false, columnDefinition = "BINARY(16)")
-  private UUID storeId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "store_id", nullable = false)
+  private Store store;
 
   @Column(name = "external_order_id", nullable = false, length = 128)
   private String externalOrderId;
@@ -97,10 +99,10 @@ public class Order {
     return "Order{"
         + "orderId="
         + orderId
-        + ", tenantId="
-        + tenant.getTenantId()
+        + ", tenant="
+        + tenant
         + ", storeId="
-        + storeId
+        + store.getStoreId()
         + ", externalOrderId='"
         + externalOrderId
         + '\''
