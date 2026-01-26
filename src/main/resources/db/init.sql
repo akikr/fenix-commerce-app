@@ -48,6 +48,7 @@ CREATE TABLE store (
   tenant_id BINARY(16) NOT NULL,
   store_code VARCHAR(100) NOT NULL,
   store_name VARCHAR(255) NOT NULL,
+  domain VARCHAR(255) NULL,
   platform ENUM('SHOPIFY','NETSUITE','CUSTOM','MAGENTO','OTHER') NOT NULL DEFAULT 'OTHER',
   timezone VARCHAR(64) NULL,
   currency CHAR(3) NULL,
@@ -272,10 +273,10 @@ VALUES
     ( UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440003', 1), 'Fashion Hub', 'fashion-hub', 'ACTIVE');
 
 -- Insert stores for tenants
-INSERT INTO store (store_id, tenant_id, store_code, store_name, platform, currency, status)
+INSERT INTO store (store_id, tenant_id, store_code, store_name, domain, platform, currency, status)
 VALUES
-    (UUID_TO_BIN('a1b2c3d4-e5f6-7890-1234-567890abcdef', 1), UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440001', 1), 'ACME-001', 'ACME Main Store', 'SHOPIFY', 'USD', 'ACTIVE'),
-    (UUID_TO_BIN('b2c3d4e5-f6a7-8901-2345-67890abcdef0', 1), UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440003', 1), 'FH-001', 'Fashion Hub Boutique', 'MAGENTO', 'EUR', 'ACTIVE');
+    (UUID_TO_BIN('a1b2c3d4-e5f6-7890-1234-567890abcdef', 1), UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440001', 1), 'ACME-001', 'ACME Main Store', 'acme.com', 'SHOPIFY', 'USD', 'ACTIVE'),
+    (UUID_TO_BIN('b2c3d4e5-f6a7-8901-2345-67890abcdef0', 1), UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440003', 1), 'FH-001', 'Fashion Hub Boutique', 'fashion-hub.com', 'MAGENTO', 'EUR', 'ACTIVE');
 
 -- Insert orders
 INSERT INTO orders (order_id, tenant_id, store_id, external_order_id, external_order_number, order_status, financial_status, fulfillment_status, customer_email, order_total_amount, currency, order_created_at)

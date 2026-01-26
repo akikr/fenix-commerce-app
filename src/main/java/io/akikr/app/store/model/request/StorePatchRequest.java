@@ -7,6 +7,6 @@ import io.akikr.app.store.model.StoreStatus;
 public record StorePatchRequest(
     @JsonProperty("code") String code,
     @JsonProperty("name") String name,
-    @JsonProperty("platform") StorePlatform platform,
     @JsonProperty("domain") String domain,
+    @JsonProperty("platform") StorePlatform platform,
     @JsonProperty("status") StoreStatus status) {}

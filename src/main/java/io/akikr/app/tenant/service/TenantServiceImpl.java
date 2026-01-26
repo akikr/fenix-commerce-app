@@ -1,12 +1,12 @@
 package io.akikr.app.tenant.service;
 
+import static io.akikr.app.shared.AppUtils.convertToSort;
 import static org.springframework.util.StringUtils.hasText;
 
 import io.akikr.app.shared.PagedResponse;
 import io.akikr.app.tenant.entity.Tenant;
 import io.akikr.app.tenant.entity.Tenant.Status;
 import io.akikr.app.tenant.exceptions.TenantException;
-import io.akikr.app.tenant.model.TenantDto;
 import io.akikr.app.tenant.model.TenantStatus;
 import io.akikr.app.tenant.model.request.TenantCreateRequest;
 import io.akikr.app.tenant.model.request.TenantPatchRequest;
@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -69,7 +68,7 @@ public class TenantServiceImpl implements TenantService {
       throw new TenantException(
           HttpStatus.BAD_REQUEST.value(),
           e,
-          "An errorDetails occurred while creating the tenant",
+          "An errorDetails occurred while creating the organization",
           "/organizations");
     }
   }
@@ -120,7 +119,7 @@ public class TenantServiceImpl implements TenantService {
       throw new TenantException(
           HttpStatus.BAD_REQUEST.value(),
           e,
-          "An errorDetails occurred while searching tenants",
+          "An errorDetails occurred while searching organizations",
           "/organizations");
     }
   }
@@ -148,7 +147,7 @@ public class TenantServiceImpl implements TenantService {
       throw new TenantException(
           HttpStatus.INTERNAL_SERVER_ERROR.value(),
           e,
-          "An errorDetails occurred while searching the tenant",
+          "An errorDetails occurred while searching the organization",
           "/organizations/search");
     }
   }
@@ -161,17 +160,16 @@ public class TenantServiceImpl implements TenantService {
       var tenant =
           tenantProcessor
               .findByTenantId(tenantId)
-              .map(TenantServiceImpl::toTenantDto)
-              .orElseThrow(() -> new RuntimeException("No Tenant found with id: " + id));
-      log.info("Tenant fetched successfully for Id:[{}]", id);
+              .orElseThrow(() -> new RuntimeException("No Tenant found with tenantId: " + id));
+      log.info("Tenant fetched successfully for tenantId:[{}]", id);
       TenantResponse response = toTenantResponse(tenant);
       return ResponseEntity.status(HttpStatus.OK).body(response);
     } catch (RuntimeException e) {
-      log.error("Error fetching tenant for Id:[{}], due to: {}", id, e.getMessage(), e);
+      log.error("Error fetching tenant for tenantId:[{}], due to: {}", id, e.getMessage(), e);
       throw new TenantException(
           HttpStatus.NOT_FOUND.value(),
           e,
-          "An errorDetails occurred while fetching the tenant",
+          "An errorDetails occurred while fetching the organizations",
           "/organizations/" + id);
     }
   }
@@ -186,18 +184,18 @@ public class TenantServiceImpl implements TenantService {
       var tenant =
           tenantProcessor
               .findByTenantId(tenantId)
-              .orElseThrow(() -> new RuntimeException("No Tenant found with id: " + id));
+              .orElseThrow(() -> new RuntimeException("No Tenant found with tenantId: " + id));
       var newTenant = toTenant(tenant.getTenantId(), request);
       var updatedTenant = tenantProcessor.saveTenant(newTenant);
-      log.info("Tenant data updated successfully for Id:[{}]", id);
+      log.info("Tenant data updated successfully for tenantId:[{}]", id);
       var response = toTenantUpdateResponse(updatedTenant);
       return ResponseEntity.status(HttpStatus.OK).body(response);
     } catch (NullPointerException | IllegalArgumentException e) {
-      log.error("Error updating tenant data for Id:[{}], due to: {}", id, e.getMessage(), e);
+      log.error("Error updating tenant data for tenantId:[{}], due to: {}", id, e.getMessage(), e);
       throw new TenantException(
           HttpStatus.NOT_FOUND.value(),
           e,
-          "An errorDetails occurred while updating the tenant",
+          "An errorDetails occurred while updating the organizations",
           "/organizations/" + id);
     }
   }
@@ -205,52 +203,56 @@ public class TenantServiceImpl implements TenantService {
   @Override
   public ResponseEntity<TenantPatchResponse> patchTenant(String id, TenantPatchRequest request)
       throws TenantException {
-    log.info("Updating partial tenant data for Id:[{}]", id);
+    log.info("Updating partial tenant data for tenantId:[{}]", id);
     try {
-      log.debug("Updating partial tenant data for Id:[{}] with data as:[{}]", id, request);
+      log.debug("Updating partial tenant data for tenantId:[{}] with data as:[{}]", id, request);
       var tenant =
           tenantProcessor
               .findByTenantId(UUID.fromString(id))
-              .orElseThrow(() -> new RuntimeException("No Tenant found with id: " + id));
+              .orElseThrow(() -> new RuntimeException("No Tenant found with tenantId: " + id));
       var patchedTenant = buildTenant(request, tenant);
       var updatedTenant = tenantProcessor.saveTenant(patchedTenant);
-      log.info("Tenant data (partiality) updated successfully for Id:[{}]", id);
+      log.info("Tenant data (partiality) updated successfully for tenantId:[{}]", id);
       var response = toTenantPatchResponse(updatedTenant);
       return ResponseEntity.status(HttpStatus.OK).body(response);
     } catch (NullPointerException | IllegalArgumentException e) {
       log.error(
-          "Error (partiality) updating tenant data for Id:[{}], due to: {}", id, e.getMessage(), e);
+          "Error (partiality) updating tenant data for tenantId:[{}], due to: {}",
+          id,
+          e.getMessage(),
+          e);
       throw new TenantException(
           HttpStatus.NOT_FOUND.value(),
           e,
-          "An errorDetails occurred while (partiality) updating the tenant",
+          "An errorDetails occurred while (partiality) updating the organizations",
           "/organizations/" + id);
     }
   }
 
   @Override
   public ResponseEntity<Void> deleteTenant(String id) throws TenantException {
-    log.info("Deactivating tenant for Id:[{}]", id);
+    log.info("Deactivating tenant for tenantId:[{}]", id);
     try {
       UUID tenantId = UUID.fromString(id);
-      var tenant =
+      var existingTenant =
           tenantProcessor
               .findByTenantId(tenantId)
-              .orElseThrow(() -> new RuntimeException("No Tenant found with id: " + id));
-      if (Status.INACTIVE.compareTo(tenant.getStatus()) == 0) {
-        log.warn("Tenant is already INACTIVE for Id:[{}]", id);
+              .orElseThrow(() -> new RuntimeException("No Tenant found with tenantId: " + id));
+      if (Status.INACTIVE.compareTo(existingTenant.getStatus()) == 0) {
+        log.warn("Tenant is already INACTIVE for tenantId:[{}]", id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
       }
-      tenant.setStatus(Status.INACTIVE);
-      var deactivatedTenant = tenantProcessor.saveTenant(tenant);
-      log.info("Tenant deactivated successfully for Id:[{}]", deactivatedTenant.getTenantId());
+      existingTenant.setStatus(Status.INACTIVE);
+      var deactivatedTenant = tenantProcessor.saveTenant(existingTenant);
+      log.info(
+          "Tenant deactivated successfully for tenantId:[{}]", deactivatedTenant.getTenantId());
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     } catch (NullPointerException | IllegalArgumentException e) {
-      log.error("Error deactivating tenant for Id:[{}], due to: {}", id, e.getMessage(), e);
+      log.error("Error deactivating tenant for tenantId:[{}], due to: {}", id, e.getMessage(), e);
       throw new TenantException(
           HttpStatus.NOT_FOUND.value(),
           e,
-          "An errorDetails occurred while deactivating the tenant",
+          "An errorDetails occurred while deleting the organizations",
           "/organizations/" + id);
     }
   }
@@ -286,34 +288,24 @@ public class TenantServiceImpl implements TenantService {
         .build();
   }
 
-  private static TenantDto toTenantDto(Tenant tenant) {
-    return new TenantDto(
-        tenant.getTenantId().toString(),
-        tenant.getExternalId(),
-        tenant.getTenantName(),
-        tenant.getStatus().name(),
-        tenant.getCreatedAt().atOffset(ZoneOffset.UTC).toString(),
-        tenant.getUpdatedAt().atOffset(ZoneOffset.UTC).toString());
-  }
-
   private static TenantCreateResponse toTenantCreateResponse(UUID tenantId, Tenant savedTenant) {
     return new TenantCreateResponse(
         tenantId.toString(),
         savedTenant.getExternalId(),
         savedTenant.getTenantName(),
         savedTenant.getStatus().name(),
-        savedTenant.getCreatedAt().toString(),
-        savedTenant.getUpdatedAt().toString());
+        savedTenant.getCreatedAt().atOffset(ZoneOffset.UTC).toString(),
+        savedTenant.getUpdatedAt().atOffset(ZoneOffset.UTC).toString());
   }
 
-  private TenantResponse toTenantResponse(TenantDto tenant) {
+  private TenantResponse toTenantResponse(Tenant tenant) {
     return new TenantResponse(
-        tenant.tenantId(),
-        tenant.externalId(),
-        tenant.name(),
-        tenant.status(),
-        tenant.createdAt(),
-        tenant.updatedAt());
+        tenant.getTenantId().toString(),
+        tenant.getExternalId(),
+        tenant.getTenantName(),
+        tenant.getStatus().name(),
+        tenant.getCreatedAt().atOffset(ZoneOffset.UTC).toString(),
+        tenant.getUpdatedAt().atOffset(ZoneOffset.UTC).toString());
   }
 
   private TenantUpdateResponse toTenantUpdateResponse(Tenant updatedTenant) {
@@ -359,17 +351,5 @@ public class TenantServiceImpl implements TenantService {
         tenantPage.getTotalElements(),
         tenantPage.getTotalPages(),
         tenantPage.hasNext());
-  }
-
-  private static Sort convertToSort(String sortStr) {
-    // Split "updatedAt,desc" into ["updatedAt", "desc"]
-    String[] parts = sortStr.split(",");
-    String property = parts[0];
-    // Default to ascending if no direction is provided or if invalid
-    Sort.Direction direction = Sort.Direction.ASC;
-    if (parts.length > 1 && parts[1].equalsIgnoreCase("desc")) {
-      direction = Sort.Direction.DESC;
-    }
-    return Sort.by(direction, property);
   }
 }

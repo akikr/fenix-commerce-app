@@ -48,6 +48,7 @@ CREATE TABLE store (
   tenant_id BINARY(16) NOT NULL,
   store_code VARCHAR(100) NOT NULL,
   store_name VARCHAR(255) NOT NULL,
+  domain VARCHAR(255) NULL,
   platform ENUM('SHOPIFY','NETSUITE','CUSTOM','MAGENTO','OTHER') NOT NULL DEFAULT 'OTHER',
   timezone VARCHAR(64) NULL,
   currency CHAR(3) NULL,

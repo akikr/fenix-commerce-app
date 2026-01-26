@@ -1,17 +1,14 @@
 package io.akikr.app.store.model.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.akikr.app.store.model.StorePlatform;
-import io.akikr.app.store.model.StoreStatus;
-import java.time.LocalDateTime;
 
 public record StorePatchResponse(
     @JsonProperty("id") String id,
     @JsonProperty("orgId") String orgId,
     @JsonProperty("code") String code,
     @JsonProperty("name") String name,
-    @JsonProperty("platform") StorePlatform platform,
+    @JsonProperty("platform") String platform,
     @JsonProperty("domain") String domain,
-    @JsonProperty("status") StoreStatus status,
-    @JsonProperty("createdAt") LocalDateTime createdAt,
-    @JsonProperty("updatedAt") LocalDateTime updatedAt) {}
+    @JsonProperty("status") String status,
+    @JsonProperty("createdAt") String createdAt,
+    @JsonProperty("updatedAt") String updatedAt) {}

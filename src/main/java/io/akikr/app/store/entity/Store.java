@@ -47,6 +47,9 @@ public class Store {
   @Column(name = "store_name", nullable = false, length = 255)
   private String storeName;
 
+  @Column(name = "domain", length = 255)
+  private String domain;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "platform", nullable = false)
   private Platform platform;
@@ -86,6 +89,9 @@ public class Store {
         + '\''
         + ", storeName='"
         + storeName
+        + '\''
+        + ", domain='"
+        + domain
         + '\''
         + ", platform="
         + platform

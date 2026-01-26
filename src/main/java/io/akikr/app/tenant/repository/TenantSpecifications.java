@@ -18,20 +18,17 @@ public final class TenantSpecifications {
     return (root, query, criteriaBuilder) -> {
       var predicate = criteriaBuilder.conjunction();
 
-      if (isNotBlank(fromDate)) {
+      if (isNotBlank(fromDate) && isNotBlank(toDate)) {
         var from = LocalDateTime.parse(fromDate).atOffset(ZoneOffset.UTC).toLocalDateTime();
         predicate =
             criteriaBuilder.and(
                 predicate, criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), from));
-      }
-      if (isNotBlank(toDate)) {
         var to = LocalDateTime.parse(toDate).atOffset(ZoneOffset.UTC).toLocalDateTime();
         predicate =
             criteriaBuilder.and(
                 predicate, criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), to));
       }
       if (nonNull(tenantStatus)) {
-
         var status = Status.valueOf(tenantStatus.name());
         predicate =
             criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("status"), status));

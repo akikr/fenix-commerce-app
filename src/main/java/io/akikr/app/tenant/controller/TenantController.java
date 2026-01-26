@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Organizations")
 @RestController
-@RequestMapping(value = "/organizations", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/organizations", produces = MediaType.APPLICATION_JSON_VALUE)
 public class TenantController {
 
   private final TenantService tenantService;
