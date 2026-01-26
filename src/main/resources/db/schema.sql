@@ -33,11 +33,13 @@ DROP TABLE IF EXISTS tenant;
 CREATE TABLE tenant (
                         tenant_id BINARY(16) NOT NULL,
                         tenant_name VARCHAR(255) NOT NULL,
+                        external_id VARCHAR(255) NOT NULL,
                         status ENUM('ACTIVE','INACTIVE') NOT NULL DEFAULT 'ACTIVE',
                         created_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
                         updated_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
                         PRIMARY KEY (tenant_id),
-                        UNIQUE KEY uk_tenant_name(tenant_name)
+                        UNIQUE KEY uk_tenant_name(tenant_name),
+                        UNIQUE KEY uk_tenant_external_id(external_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- store table

@@ -43,13 +43,16 @@ class TenantServiceTest {
 
   private Tenant tenant;
   private UUID tenantId;
+  private String externalId;
 
   @BeforeEach
   void setUp() {
     tenantId = UUID.randomUUID();
+    externalId = "ext-" + tenantId;
     tenant =
         Tenant.builder()
             .tenantId(tenantId)
+            .externalId(externalId)
             .tenantName("test-tenant")
             .status(Tenant.Status.ACTIVE)
             .createdAt(LocalDateTime.now())
@@ -63,7 +66,7 @@ class TenantServiceTest {
   void testCreateTenant_Success() {
     // Arrange
     TenantCreateRequest request =
-        new TenantCreateRequest(tenantId.toString(), "test-tenant", TenantStatus.ACTIVE);
+        new TenantCreateRequest(externalId, "test-tenant", TenantStatus.ACTIVE);
     when(tenantProcessor.saveTenant(any(Tenant.class))).thenReturn(tenant);
 
     // Act
@@ -75,7 +78,7 @@ class TenantServiceTest {
 
     var response = responseEntity.getBody();
     assertNotNull(response);
-    assertEquals(tenantId.toString(), response.externalId());
+    assertEquals(externalId, response.externalId());
   }
 
   @Test
@@ -83,7 +86,7 @@ class TenantServiceTest {
   void testCreateTenant_Failure() {
     // Arrange
     TenantCreateRequest request =
-        new TenantCreateRequest(tenantId.toString(), "test-tenant", TenantStatus.ACTIVE);
+        new TenantCreateRequest(externalId, "test-tenant", TenantStatus.ACTIVE);
 
     // Mock
     when(tenantProcessor.saveTenant(any(Tenant.class)))
@@ -139,7 +142,7 @@ class TenantServiceTest {
     assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     var responseBody = responseEntity.getBody();
     assertNotNull(responseBody);
-    assertEquals(tenantId.toString(), responseBody.externalId());
+    assertEquals(externalId, responseBody.externalId());
   }
 
   @Test
@@ -158,7 +161,8 @@ class TenantServiceTest {
   @DisplayName("Test updateTenant - Success")
   void testUpdateTenant_Success() {
     // Arrange
-    TenantUpdateRequest request = new TenantUpdateRequest("updated-name", TenantStatus.INACTIVE);
+    TenantUpdateRequest request =
+        new TenantUpdateRequest(externalId, "updated-name", TenantStatus.INACTIVE);
     when(tenantProcessor.findByTenantId(tenantId)).thenReturn(Optional.of(tenant));
     when(tenantProcessor.saveTenant(any(Tenant.class))).thenReturn(tenant);
 
@@ -176,7 +180,8 @@ class TenantServiceTest {
   @DisplayName("Test updateTenant - Not Found")
   void testUpdateTenant_NotFound() {
     // Arrange
-    TenantUpdateRequest request = new TenantUpdateRequest("updated-name", TenantStatus.INACTIVE);
+    TenantUpdateRequest request =
+        new TenantUpdateRequest(externalId, "updated-name", TenantStatus.INACTIVE);
     when(tenantProcessor.findByTenantId(tenantId)).thenReturn(Optional.empty());
 
     // Act and Assert
@@ -189,7 +194,8 @@ class TenantServiceTest {
   @DisplayName("Test patchTenant - Success")
   void testPatchTenant_Success() {
     // Arrange
-    TenantPatchRequest request = new TenantPatchRequest("patched-name", TenantStatus.ACTIVE);
+    TenantPatchRequest request =
+        new TenantPatchRequest(externalId, "patched-name", TenantStatus.ACTIVE);
     when(tenantProcessor.findByTenantId(tenantId)).thenReturn(Optional.of(tenant));
     when(tenantProcessor.saveTenant(any(Tenant.class))).thenReturn(tenant);
 
@@ -207,7 +213,7 @@ class TenantServiceTest {
   @DisplayName("Test patchTenant - Not Found")
   void testPatchTenant_NotFound() {
     // Arrange
-    TenantPatchRequest request = new TenantPatchRequest("patched-name", null);
+    TenantPatchRequest request = new TenantPatchRequest(externalId, "patched-name", null);
     when(tenantProcessor.findByTenantId(tenantId)).thenReturn(Optional.empty());
 
     // Act & Assert

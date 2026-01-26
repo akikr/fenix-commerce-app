@@ -33,15 +33,17 @@ class TenantProcessorTest extends MySqlTestContainer {
   private TenantProcessor tenantProcessor;
 
   private Tenant tenant1;
+  private String externalId1;
 
   @BeforeEach
   void setUp() {
     tenantProcessor = new TenantProcessor(tenantRepository);
 
+    externalId1 = "ext-" + UUID.randomUUID();
     tenant1 =
         Tenant.builder()
-            .tenantId(UUID.randomUUID())
             .tenantName("test-tenant-1")
+            .externalId(externalId1)
             .status(Tenant.Status.ACTIVE)
             .createdAt(LocalDateTime.now().minusDays(2))
             .build();
@@ -55,7 +57,7 @@ class TenantProcessorTest extends MySqlTestContainer {
   void testSaveTenant_Success() {
     // Arrange
     Tenant newTenant =
-        Tenant.builder().tenantId(UUID.randomUUID()).tenantName("new-tenant").build();
+        Tenant.builder().tenantName("new-tenant").externalId("ext-" + UUID.randomUUID()).build();
 
     // Act
     Tenant savedTenant = tenantProcessor.saveTenant(newTenant);
@@ -150,5 +152,33 @@ class TenantProcessorTest extends MySqlTestContainer {
 
     // Assert
     assertFalse(foundTenant.isPresent());
+  }
+
+  @Test
+  @DisplayName("Test findByExternalId - Success")
+  void testFindByExternalId_Success() {
+    // Arrange
+    PageRequest pageable = PageRequest.of(0, 10);
+
+    // Act
+    Page<Tenant> foundTenants = tenantProcessor.findByExternalId(externalId1, pageable);
+
+    // Assert
+    assertEquals(1, foundTenants.getTotalElements());
+    assertEquals(externalId1, foundTenants.getContent().get(0).getExternalId());
+  }
+
+  @Test
+  @DisplayName("Test findByExternalId - Not Found")
+  void testFindByExternalId_NotFound() {
+    // Arrange
+    String nonExistentExternalId = "ext-non-existent";
+    PageRequest pageable = PageRequest.of(0, 10);
+
+    // Act
+    Page<Tenant> foundTenants = tenantProcessor.findByExternalId(nonExistentExternalId, pageable);
+
+    // Assert
+    assertTrue(foundTenants.isEmpty());
   }
 }

@@ -33,11 +33,13 @@ DROP TABLE IF EXISTS tenant;
 CREATE TABLE tenant (
                         tenant_id BINARY(16) NOT NULL,
                         tenant_name VARCHAR(255) NOT NULL,
+                        external_id VARCHAR(255) NOT NULL,
                         status ENUM('ACTIVE','INACTIVE') NOT NULL DEFAULT 'ACTIVE',
                         created_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
                         updated_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
                         PRIMARY KEY (tenant_id),
-                        UNIQUE KEY uk_tenant_name(tenant_name)
+                        UNIQUE KEY uk_tenant_name(tenant_name),
+                        UNIQUE KEY uk_tenant_external_id(external_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- store table
@@ -263,11 +265,11 @@ CREATE TABLE tracking_events (
 -- ============================================================
 
 -- Insert tenants
-INSERT INTO tenant (tenant_id, tenant_name, status)
+INSERT INTO tenant (tenant_id, tenant_name, external_id, status)
 VALUES
-    ( UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440001', 1), 'ACME Corporation', 'ACTIVE'),
-    ( UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440002', 1), 'TechStore Inc', 'INACTIVE'),
-    ( UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440003', 1), 'Fashion Hub', 'ACTIVE');
+    ( UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440001', 1), 'ACME Corporation', 'acme-corp', 'ACTIVE'),
+    ( UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440002', 1), 'TechStore Inc', 'tech-inc', 'INACTIVE'),
+    ( UUID_TO_BIN('550e8400-e29b-41d4-a716-446655440003', 1), 'Fashion Hub', 'fashion-hub', 'ACTIVE');
 
 -- Insert stores for tenants
 INSERT INTO store (store_id, tenant_id, store_code, store_name, platform, currency, status)

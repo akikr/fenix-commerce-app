@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -22,15 +23,22 @@ import lombok.Setter;
 @Entity
 @Table(
     name = "tenant",
-    uniqueConstraints = @UniqueConstraint(name = "uk_tenant_name", columnNames = "tenant_name"))
+    uniqueConstraints = {
+      @UniqueConstraint(name = "uk_tenant_name", columnNames = "tenant_name"),
+      @UniqueConstraint(name = "uk_tenant_external_id", columnNames = "external_id")
+    })
 public class Tenant {
 
   @Id
+  @GeneratedValue
   @Column(name = "tenant_id", columnDefinition = "BINARY(16)")
   private UUID tenantId;
 
   @Column(name = "tenant_name", nullable = false, length = 255)
   private String tenantName;
+
+  @Column(name = "external_id", nullable = false, length = 255)
+  private String externalId;
 
   @Builder.Default
   @Enumerated(EnumType.STRING)
@@ -54,6 +62,9 @@ public class Tenant {
         + tenantId
         + ", tenantName='"
         + tenantName
+        + '\''
+        + ", externalId='"
+        + externalId
         + '\''
         + ", status="
         + status

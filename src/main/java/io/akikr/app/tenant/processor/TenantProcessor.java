@@ -39,4 +39,9 @@ public class TenantProcessor {
   public Optional<Tenant> findByTenantId(UUID tenantId) {
     return tenantRepository.findByTenantId(tenantId);
   }
+
+  @Transactional(readOnly = true)
+  public Page<Tenant> findByExternalId(String externalId, PageRequest pageable) {
+    return tenantRepository.findByExternalId(externalId, pageable);
+  }
 }

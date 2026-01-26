@@ -135,8 +135,7 @@ public class TenantServiceImpl implements TenantService {
         size);
     try {
       var pageable = PageRequest.of(page, size);
-      UUID tenantId = UUID.fromString(externalId);
-      var tenantPage = tenantProcessor.findByTenantId(tenantId, pageable);
+      var tenantPage = tenantProcessor.findByExternalId(externalId, pageable);
       log.info(
           "Tenants search completed successfully for externalId:[{}] with totalElements:[{}]",
           externalId,
@@ -260,7 +259,7 @@ public class TenantServiceImpl implements TenantService {
     var tenantStatus = request.status();
     var status = Status.valueOf(tenantStatus.name());
     return Tenant.builder()
-        .tenantId(UUID.fromString(request.externalId()))
+        .externalId(request.externalId())
         .tenantName(request.name())
         .status(status)
         .build();
@@ -269,6 +268,7 @@ public class TenantServiceImpl implements TenantService {
   private static Tenant toTenant(UUID tenantId, TenantUpdateRequest request) {
     return Tenant.builder()
         .tenantId(tenantId)
+        .externalId(request.externalId())
         .tenantName(request.name())
         .status(Status.valueOf(request.status().name()))
         .build();
@@ -277,12 +277,10 @@ public class TenantServiceImpl implements TenantService {
   private static Tenant buildTenant(TenantPatchRequest request, Tenant tenant) {
     return Tenant.builder()
         .tenantId(tenant.getTenantId())
-        .tenantName(
-            (Objects.nonNull(request.name()) && hasText(request.name())
-                ? request.name()
-                : tenant.getTenantName()))
+        .externalId((hasText(request.externalId())) ? request.externalId() : tenant.getExternalId())
+        .tenantName((hasText(request.name()) ? request.name() : tenant.getTenantName()))
         .status(
-            (Objects.nonNull(request.status()) && hasText(request.status().name())
+            (hasText(request.status().name())
                 ? Status.valueOf(request.status().name())
                 : tenant.getStatus()))
         .build();
@@ -291,6 +289,7 @@ public class TenantServiceImpl implements TenantService {
   private static TenantDto toTenantDto(Tenant tenant) {
     return new TenantDto(
         tenant.getTenantId().toString(),
+        tenant.getExternalId(),
         tenant.getTenantName(),
         tenant.getStatus().name(),
         tenant.getCreatedAt().atOffset(ZoneOffset.UTC).toString(),
@@ -300,6 +299,7 @@ public class TenantServiceImpl implements TenantService {
   private static TenantCreateResponse toTenantCreateResponse(UUID tenantId, Tenant savedTenant) {
     return new TenantCreateResponse(
         tenantId.toString(),
+        savedTenant.getExternalId(),
         savedTenant.getTenantName(),
         savedTenant.getStatus().name(),
         savedTenant.getCreatedAt().toString(),
@@ -308,6 +308,7 @@ public class TenantServiceImpl implements TenantService {
 
   private TenantResponse toTenantResponse(TenantDto tenant) {
     return new TenantResponse(
+        tenant.tenantId(),
         tenant.externalId(),
         tenant.name(),
         tenant.status(),
@@ -318,6 +319,7 @@ public class TenantServiceImpl implements TenantService {
   private TenantUpdateResponse toTenantUpdateResponse(Tenant updatedTenant) {
     return new TenantUpdateResponse(
         updatedTenant.getTenantId().toString(),
+        updatedTenant.getExternalId(),
         updatedTenant.getTenantName(),
         updatedTenant.getStatus().name(),
         updatedTenant.getCreatedAt().atOffset(ZoneOffset.UTC).toString(),
@@ -327,6 +329,7 @@ public class TenantServiceImpl implements TenantService {
   private TenantPatchResponse toTenantPatchResponse(Tenant updatedTenant) {
     return new TenantPatchResponse(
         updatedTenant.getTenantId().toString(),
+        updatedTenant.getExternalId(),
         updatedTenant.getTenantName(),
         updatedTenant.getStatus().name(),
         updatedTenant.getCreatedAt().atOffset(ZoneOffset.UTC).toString(),
@@ -336,6 +339,7 @@ public class TenantServiceImpl implements TenantService {
   private static TenantSearchResponse toTenantSearchResponse(Tenant tenant) {
     return new TenantSearchResponse(
         tenant.getTenantId().toString(),
+        tenant.getExternalId(),
         tenant.getTenantName(),
         tenant.getStatus().name(),
         tenant.getCreatedAt().atOffset(ZoneOffset.UTC).toString(),

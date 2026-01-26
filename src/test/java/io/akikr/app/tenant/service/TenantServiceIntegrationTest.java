@@ -33,6 +33,7 @@ public class TenantServiceIntegrationTest extends MySqlTestContainer {
   private TenantService tenantService;
 
   private UUID activeTenantId;
+  private String activeExternalId;
   private Tenant activeTenant;
 
   @BeforeEach
@@ -40,25 +41,26 @@ public class TenantServiceIntegrationTest extends MySqlTestContainer {
     tenantService = new TenantServiceImpl(new TenantProcessor(tenantRepository));
     tenantRepository.deleteAll();
 
-    activeTenantId = UUID.randomUUID();
+    activeExternalId = "ext-" + UUID.randomUUID();
     activeTenant =
         Tenant.builder()
-            .tenantId(activeTenantId)
             .tenantName("active-tenant")
+            .externalId(activeExternalId)
             .status(Tenant.Status.ACTIVE)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build();
-    tenantRepository.save(activeTenant);
+    activeTenant = tenantRepository.save(activeTenant);
+    activeTenantId = activeTenant.getTenantId();
   }
 
   @Test
   @DisplayName("Integration Test: createTenant - Success")
   void testCreateTenant_Success() {
     // Arrange
-    UUID newTenantId = UUID.randomUUID();
+    String newExternalId = "ext-" + UUID.randomUUID();
     TenantCreateRequest request =
-        new TenantCreateRequest(newTenantId.toString(), "new-tenant", TenantStatus.ACTIVE);
+        new TenantCreateRequest(newExternalId, "new-tenant", TenantStatus.ACTIVE);
 
     // Act
     var responseEntity = tenantService.createTenant(request);
@@ -69,8 +71,8 @@ public class TenantServiceIntegrationTest extends MySqlTestContainer {
 
     var createResponse = responseEntity.getBody();
     assertNotNull(createResponse);
-    assertEquals(newTenantId.toString(), createResponse.externalId());
-    assertTrue(tenantRepository.findByTenantId(newTenantId).isPresent());
+    assertEquals(newExternalId, createResponse.externalId());
+    assertTrue(tenantRepository.findByExternalId(newExternalId, null).hasContent());
   }
 
   @Test
@@ -78,19 +80,23 @@ public class TenantServiceIntegrationTest extends MySqlTestContainer {
   void testCreateTenant_Failure() {
     // Arrange
     // Using the ID of the tenant created in setUp
-    var tenantId = UUID.randomUUID();
+    var externalId = "ext-" + UUID.randomUUID();
     var request =
-        new TenantCreateRequest(
-            tenantId.toString(), activeTenant.getTenantName(), TenantStatus.ACTIVE);
+        new TenantCreateRequest(externalId, activeTenant.getTenantName(), TenantStatus.ACTIVE);
 
-    // Act and Assert
+    // Act
     var responseEntity = tenantService.createTenant(request);
+
+    // Assert
     assertNotNull(responseEntity);
     assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-
     var createResponse = responseEntity.getBody();
     assertNotNull(createResponse);
-    assertThrows(RuntimeException.class, () -> tenantRepository.findByTenantId(tenantId));
+    assertNotNull(createResponse.id());
+    // Act and Assert
+    assertThrows(
+        RuntimeException.class,
+        () -> tenantRepository.findByTenantId(UUID.fromString(createResponse.id())));
   }
 
   @Test
@@ -107,7 +113,7 @@ public class TenantServiceIntegrationTest extends MySqlTestContainer {
     assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     var responseBody = responseEntity.getBody();
     assertNotNull(responseBody);
-    assertEquals(id, responseBody.externalId());
+    assertEquals(activeExternalId, responseBody.externalId());
   }
 
   @Test
@@ -156,7 +162,8 @@ public class TenantServiceIntegrationTest extends MySqlTestContainer {
   void testUpdateTenant_Success() {
     // Arrange
     String id = activeTenantId.toString();
-    TenantUpdateRequest request = new TenantUpdateRequest("updated-name", TenantStatus.INACTIVE);
+    TenantUpdateRequest request =
+        new TenantUpdateRequest(activeExternalId, "updated-name", TenantStatus.INACTIVE);
 
     // Act
     var responseEntity = tenantService.updateTenant(id, request);
@@ -183,7 +190,8 @@ public class TenantServiceIntegrationTest extends MySqlTestContainer {
   void testUpdateTenant_Failure() {
     // Arrange
     String id = UUID.randomUUID().toString();
-    TenantUpdateRequest request = new TenantUpdateRequest("updated-name", TenantStatus.INACTIVE);
+    TenantUpdateRequest request =
+        new TenantUpdateRequest("ext-id", "updated-name", TenantStatus.INACTIVE);
 
     // Act and Assert
     assertThrows(RuntimeException.class, () -> tenantService.updateTenant(id, request));
@@ -194,7 +202,8 @@ public class TenantServiceIntegrationTest extends MySqlTestContainer {
   void testPatchTenant_Success() {
     // Arrange
     String id = activeTenantId.toString();
-    TenantPatchRequest request = new TenantPatchRequest("patched-name", null);
+    TenantPatchRequest request =
+        new TenantPatchRequest(activeExternalId, "patched-name", TenantStatus.ACTIVE);
 
     // Act
     var responseEntity = tenantService.patchTenant(id, request);
@@ -221,7 +230,7 @@ public class TenantServiceIntegrationTest extends MySqlTestContainer {
   void testPatchTenant_Failure() {
     // Arrange
     String id = UUID.randomUUID().toString();
-    TenantPatchRequest request = new TenantPatchRequest("patched-name", null);
+    TenantPatchRequest request = new TenantPatchRequest("ext-id", "patched-name", null);
 
     // Act and Assert
     assertThrows(RuntimeException.class, () -> tenantService.patchTenant(id, request));

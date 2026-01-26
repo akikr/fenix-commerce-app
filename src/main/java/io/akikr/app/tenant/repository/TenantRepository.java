@@ -16,4 +16,6 @@ public interface TenantRepository
   Page<Tenant> findByTenantId(UUID tenantId, Pageable pageable);
 
   Optional<Tenant> findByTenantId(UUID tenantId);
+
+  Page<Tenant> findByExternalId(String externalId, Pageable pageable);
 }

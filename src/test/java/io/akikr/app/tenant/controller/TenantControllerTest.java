@@ -45,8 +45,8 @@ class TenantControllerTest extends MySqlTestContainer {
     tenantRepository.deleteAll();
     activeTenant =
         Tenant.builder()
-            .tenantId(UUID.randomUUID())
             .tenantName("active-tenant")
+            .externalId("active-tenant-ext-id")
             .status(Tenant.Status.ACTIVE)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
@@ -58,9 +58,7 @@ class TenantControllerTest extends MySqlTestContainer {
   @DisplayName("API Test: createTenant - Success")
   void createTenant_Success() throws Exception {
     // Arrange
-    var newTenantId = UUID.randomUUID();
-    var request =
-        new TenantCreateRequest(newTenantId.toString(), "new-tenant", TenantStatus.ACTIVE);
+    var request = new TenantCreateRequest("new-tenant-ext-id", "new-tenant", TenantStatus.ACTIVE);
 
     // Act & Assert
     mockMvc
@@ -69,7 +67,7 @@ class TenantControllerTest extends MySqlTestContainer {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.externalId").value(newTenantId.toString()));
+        .andExpect(jsonPath("$.externalId").value("new-tenant-ext-id"));
   }
 
   @Test
@@ -79,7 +77,7 @@ class TenantControllerTest extends MySqlTestContainer {
     mockMvc
         .perform(get("/organizations/{id}", activeTenant.getTenantId()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.externalId").value(activeTenant.getTenantId().toString()));
+        .andExpect(jsonPath("$.externalId").value(activeTenant.getExternalId()));
   }
 
   @Test
@@ -113,7 +111,9 @@ class TenantControllerTest extends MySqlTestContainer {
   @DisplayName("API Test: updateTenant - Success")
   void updateTenant_Success() throws Exception {
     // Arrange
-    TenantUpdateRequest request = new TenantUpdateRequest("updated-name", TenantStatus.INACTIVE);
+    TenantUpdateRequest request =
+        new TenantUpdateRequest(
+            activeTenant.getExternalId(), "updated-name", TenantStatus.INACTIVE);
 
     // Act & Assert
     mockMvc
@@ -130,7 +130,8 @@ class TenantControllerTest extends MySqlTestContainer {
   @DisplayName("API Test: updateTenant - Not Found")
   void updateTenant_NotFound() throws Exception {
     // Arrange
-    TenantUpdateRequest request = new TenantUpdateRequest("updated-name", TenantStatus.INACTIVE);
+    TenantUpdateRequest request =
+        new TenantUpdateRequest("ext-id", "updated-name", TenantStatus.INACTIVE);
 
     // Act & Assert
     mockMvc
@@ -145,7 +146,8 @@ class TenantControllerTest extends MySqlTestContainer {
   @DisplayName("API Test: patchTenant - Success")
   void patchTenant_Success() throws Exception {
     // Arrange
-    TenantPatchRequest request = new TenantPatchRequest("patched-name", null);
+    TenantPatchRequest request =
+        new TenantPatchRequest(activeTenant.getExternalId(), "patched-name", TenantStatus.INACTIVE);
 
     // Act & Assert
     mockMvc
@@ -154,14 +156,15 @@ class TenantControllerTest extends MySqlTestContainer {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.name").value("patched-name"));
+        .andExpect(jsonPath("$.name").value("patched-name"))
+        .andExpect(jsonPath("$.status").value(TenantStatus.INACTIVE.name()));
   }
 
   @Test
   @DisplayName("API Test: patchTenant - Not Found")
   void patchTenant_NotFound() throws Exception {
     // Arrange
-    TenantPatchRequest request = new TenantPatchRequest("patched-name", null);
+    TenantPatchRequest request = new TenantPatchRequest("ext-id", "patched-name", null);
 
     // Act & Assert
     mockMvc
