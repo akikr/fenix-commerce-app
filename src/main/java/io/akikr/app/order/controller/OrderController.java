@@ -3,14 +3,15 @@ package io.akikr.app.order.controller;
 import io.akikr.app.order.model.FinancialStatus;
 import io.akikr.app.order.model.FulfillmentStatus;
 import io.akikr.app.order.model.OrderStatus;
-import io.akikr.app.order.model.request.OrderCreateRequest;
 import io.akikr.app.order.model.request.OrderPatchRequest;
 import io.akikr.app.order.model.request.OrderUpdateRequest;
-import io.akikr.app.order.model.response.OrderCreateResponse;
+import io.akikr.app.order.model.request.OrderUpsertRequest;
 import io.akikr.app.order.model.response.OrderPatchResponse;
 import io.akikr.app.order.model.response.OrderResponse;
 import io.akikr.app.order.model.response.OrderSearchResponse;
 import io.akikr.app.order.model.response.OrderUpdateResponse;
+import io.akikr.app.order.model.response.OrderUpsertResponse;
+import io.akikr.app.order.service.OrderCommandService;
 import io.akikr.app.shared.PagedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,11 +32,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/orders")
 public class OrderController {
 
+  private final OrderCommandService orderCommandService;
+
+  public OrderController(OrderCommandService orderCommandService) {
+    this.orderCommandService = orderCommandService;
+  }
+
   @Operation(summary = "Create (or upsert) order")
   @PostMapping
-  public ResponseEntity<OrderCreateResponse> createOrder(@RequestBody OrderCreateRequest request) {
-    // TODO: Implement service layer
-    return ResponseEntity.ok().build();
+  public ResponseEntity<OrderUpsertResponse> createOrder(@RequestBody OrderUpsertRequest request) {
+    return orderCommandService.upsertOrder(request);
   }
 
   @Operation(summary = "Search orders (date range + pagination)")

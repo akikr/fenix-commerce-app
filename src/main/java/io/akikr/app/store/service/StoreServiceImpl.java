@@ -331,6 +331,39 @@ public class StoreServiceImpl implements StoreService {
     }
   }
 
+  @Override
+  public Store verifyStoreBelongsToTenant(String orgId, String storeId) throws StoreException {
+    log.info("Verifying store for orgId:[{}] and storeId:[{}]", orgId, storeId);
+    try {
+      return serviceProcessor
+          .findByStoreIdAndTenantId(UUID.fromString(storeId), UUID.fromString(orgId))
+          .orElseThrow(
+              () ->
+                  new RuntimeException(
+                      "Store with id:[ "
+                          + storeId
+                          + "] not found or does not belong to orgId:["
+                          + orgId
+                          + "]"));
+    } catch (IllegalArgumentException e) {
+      log.error(
+          "Error verifying store for orgId:[{}] and storeId:[{}] due to: {}",
+          orgId,
+          storeId,
+          e.getMessage(),
+          e);
+      throw new StoreException(
+          HttpStatus.BAD_REQUEST.value(),
+          e,
+          "An errorDetails occurred while deactivating the website",
+          "verifyStoreBelongsToOrganization for orgId:["
+              + orgId
+              + "] and storeId:["
+              + storeId
+              + "]");
+    }
+  }
+
   private StoreCreateResponse toStoreCreateResponse(Store savedStore) {
     return new StoreCreateResponse(
         savedStore.getStoreId().toString(),

@@ -3,7 +3,7 @@ package io.akikr.app.order.model.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.math.BigDecimal;
 
-public record OrderResponse(
+public record OrderUpsertResponse(
     @JsonProperty("id") String id,
     @JsonProperty("orgId") String orgId,
     @JsonProperty("websiteId") String websiteId,

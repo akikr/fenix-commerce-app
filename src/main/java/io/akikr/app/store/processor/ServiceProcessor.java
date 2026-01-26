@@ -2,15 +2,16 @@ package io.akikr.app.store.processor;
 
 import io.akikr.app.store.entity.Store;
 import io.akikr.app.store.repository.StoreRepository;
-import java.util.Optional;
-import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
+import java.util.Optional;
+import java.util.UUID;
+
+@Component
 public class ServiceProcessor {
 
   private final StoreRepository storeRepository;

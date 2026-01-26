@@ -81,7 +81,7 @@ public class Order {
   private LocalDateTime orderUpdatedAt;
 
   @Column(name = "ingested_at", nullable = false)
-  private LocalDateTime ingestedAt;
+  private LocalDateTime ingestedAt = LocalDateTime.now();
 
   @Column(name = "raw_payload_json", columnDefinition = "JSON")
   private String rawPayloadJson;

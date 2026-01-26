@@ -1,6 +1,7 @@
 package io.akikr.app.store.service;
 
 import io.akikr.app.shared.PagedResponse;
+import io.akikr.app.store.entity.Store;
 import io.akikr.app.store.exceptions.StoreException;
 import io.akikr.app.store.model.StorePlatform;
 import io.akikr.app.store.model.StoreStatus;
@@ -50,4 +51,6 @@ public interface StoreService {
       String orgId, String websiteId, StorePatchRequest request) throws StoreException;
 
   ResponseEntity<Void> deleteStore(String orgId, String websiteId) throws StoreException;
+
+  Store verifyStoreBelongsToTenant(String orgId, String storeId) throws StoreException;
 }
