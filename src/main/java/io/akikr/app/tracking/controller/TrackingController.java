@@ -29,75 +29,74 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/fulfillments/{fulfillmentId}/tracking")
 public class TrackingController {
 
-  @Operation(summary = "Create tracking for a fulfillment")
-  @PostMapping
-  public ResponseEntity<TrackingCreateResponse> createTracking(
-      @PathVariable String fulfillmentId, @RequestBody TrackingCreateRequest request) {
-    // TODO: Implement service layer
-    return ResponseEntity.ok().build();
-  }
+    @Operation(summary = "Create tracking for a fulfillment")
+    @PostMapping
+    public ResponseEntity<TrackingCreateResponse> createTracking(
+            @PathVariable String fulfillmentId, @RequestBody TrackingCreateRequest request) {
+        // TODO: Implement service layer
+        return ResponseEntity.ok().build();
+    }
 
-  @Operation(summary = "List/search tracking for a fulfillment (date range + pagination)")
-  @GetMapping
-  public ResponseEntity<PagedResponse<TrackingSearchResponse>> listTracking(
-      @PathVariable String fulfillmentId,
-      @RequestParam(name = "from", required = false) String fromDate,
-      @RequestParam(name = "to", required = false) String toDate,
-      @RequestParam(name = "page", defaultValue = "0") int page,
-      @RequestParam(name = "size", defaultValue = "50") int size,
-      @RequestParam(name = "sort", defaultValue = "updatedAt,desc") String sort,
-      @RequestParam(name = "status", required = false) TrackingStatus status,
-      @RequestParam(name = "carrier", required = false) String carrier,
-      @RequestParam(name = "trackingNumber", required = false) String trackingNumber) {
-    // TODO: Implement service layer
-    return ResponseEntity.ok().build();
-  }
+    @Operation(summary = "List/search tracking for a fulfillment (date range + pagination)")
+    @GetMapping
+    public ResponseEntity<PagedResponse<TrackingSearchResponse>> listTracking(
+            @PathVariable String fulfillmentId,
+            @RequestParam(name = "from", required = false) String fromDate,
+            @RequestParam(name = "to", required = false) String toDate,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "50") int size,
+            @RequestParam(name = "sort", defaultValue = "updatedAt,desc") String sort,
+            @RequestParam(name = "status", required = false) TrackingStatus status,
+            @RequestParam(name = "carrier", required = false) String carrier,
+            @RequestParam(name = "trackingNumber", required = false) String trackingNumber) {
+        // TODO: Implement service layer
+        return ResponseEntity.ok().build();
+    }
 
-  @Operation(summary = "Search tracking by trackingNumber (within fulfillment)")
-  @GetMapping("/search")
-  public ResponseEntity<PagedResponse<TrackingSearchResponse>> searchTrackingByNumber(
-      @PathVariable String fulfillmentId,
-      @RequestParam(name = "trackingNumber") String trackingNumber,
-      @RequestParam(name = "carrier", required = false) String carrier,
-      @RequestParam(name = "page", defaultValue = "0") int page,
-      @RequestParam(name = "size", defaultValue = "50") int size) {
-    // TODO: Implement service layer
-    return ResponseEntity.ok().build();
-  }
+    @Operation(summary = "Search tracking by trackingNumber (within fulfillment)")
+    @GetMapping("/search")
+    public ResponseEntity<PagedResponse<TrackingSearchResponse>> searchTrackingByNumber(
+            @PathVariable String fulfillmentId,
+            @RequestParam(name = "trackingNumber") String trackingNumber,
+            @RequestParam(name = "carrier", required = false) String carrier,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "50") int size) {
+        // TODO: Implement service layer
+        return ResponseEntity.ok().build();
+    }
 
-  @Operation(summary = "Get tracking by id")
-  @GetMapping("/{trackingId}")
-  public ResponseEntity<TrackingResponse> getTrackingById(
-      @PathVariable String fulfillmentId, @PathVariable String trackingId) {
-    // TODO: Implement service layer
-    return ResponseEntity.ok().build();
-  }
+    @Operation(summary = "Get tracking by id")
+    @GetMapping("/{trackingId}")
+    public ResponseEntity<TrackingResponse> getTrackingById(
+            @PathVariable String fulfillmentId, @PathVariable String trackingId) {
+        // TODO: Implement service layer
+        return ResponseEntity.ok().build();
+    }
 
-  @Operation(summary = "Update tracking (full replace)")
-  @PutMapping("/{trackingId}")
-  public ResponseEntity<TrackingUpdateResponse> updateTracking(
-      @PathVariable String fulfillmentId,
-      @PathVariable String trackingId,
-      @RequestBody TrackingUpdateRequest request) {
-    // TODO: Implement service layer
-    return ResponseEntity.ok().build();
-  }
+    @Operation(summary = "Update tracking (full replace)")
+    @PutMapping("/{trackingId}")
+    public ResponseEntity<TrackingUpdateResponse> updateTracking(
+            @PathVariable String fulfillmentId,
+            @PathVariable String trackingId,
+            @RequestBody TrackingUpdateRequest request) {
+        // TODO: Implement service layer
+        return ResponseEntity.ok().build();
+    }
 
-  @Operation(summary = "Update tracking (partial)")
-  @PatchMapping("/{trackingId}")
-  public ResponseEntity<TrackingPatchResponse> patchTracking(
-      @PathVariable String fulfillmentId,
-      @PathVariable String trackingId,
-      @RequestBody TrackingPatchRequest request) {
-    // TODO: Implement service layer
-    return ResponseEntity.ok().build();
-  }
+    @Operation(summary = "Update tracking (partial)")
+    @PatchMapping("/{trackingId}")
+    public ResponseEntity<TrackingPatchResponse> patchTracking(
+            @PathVariable String fulfillmentId,
+            @PathVariable String trackingId,
+            @RequestBody TrackingPatchRequest request) {
+        // TODO: Implement service layer
+        return ResponseEntity.ok().build();
+    }
 
-  @Operation(summary = "Delete tracking")
-  @DeleteMapping("/{trackingId}")
-  public ResponseEntity<Void> deleteTracking(
-      @PathVariable String fulfillmentId, @PathVariable String trackingId) {
-    // TODO: Implement service layer
-    return ResponseEntity.noContent().build();
-  }
+    @Operation(summary = "Delete tracking")
+    @DeleteMapping("/{trackingId}")
+    public ResponseEntity<Void> deleteTracking(@PathVariable String fulfillmentId, @PathVariable String trackingId) {
+        // TODO: Implement service layer
+        return ResponseEntity.noContent().build();
+    }
 }

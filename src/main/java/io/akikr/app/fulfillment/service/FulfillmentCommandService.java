@@ -7,6 +7,6 @@ import org.springframework.http.ResponseEntity;
 
 public interface FulfillmentCommandService {
 
-  ResponseEntity<FulfillmentCreateResponse> createFulfillment(
-      String orderId, FulfillmentCreateRequest request) throws FulfillmentException;
+    ResponseEntity<FulfillmentCreateResponse> createFulfillment(String orderId, FulfillmentCreateRequest request)
+            throws FulfillmentException;
 }

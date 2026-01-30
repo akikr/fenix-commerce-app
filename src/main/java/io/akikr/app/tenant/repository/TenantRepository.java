@@ -10,12 +10,11 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TenantRepository
-    extends JpaRepository<Tenant, UUID>, JpaSpecificationExecutor<Tenant> {
+public interface TenantRepository extends JpaRepository<Tenant, UUID>, JpaSpecificationExecutor<Tenant> {
 
-  Page<Tenant> findByTenantId(UUID tenantId, Pageable pageable);
+    Page<Tenant> findByTenantId(UUID tenantId, Pageable pageable);
 
-  Optional<Tenant> findByTenantId(UUID tenantId);
+    Optional<Tenant> findByTenantId(UUID tenantId);
 
-  Page<Tenant> findByExternalId(String externalId, Pageable pageable);
+    Page<Tenant> findByExternalId(String externalId, Pageable pageable);
 }

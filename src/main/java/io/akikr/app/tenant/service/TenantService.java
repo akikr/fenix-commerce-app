@@ -16,29 +16,26 @@ import org.springframework.http.ResponseEntity;
 
 public interface TenantService {
 
-  ResponseEntity<TenantCreateResponse> createTenant(TenantCreateRequest request)
-      throws TenantException;
+    ResponseEntity<TenantCreateResponse> createTenant(TenantCreateRequest request) throws TenantException;
 
-  ResponseEntity<PagedResponse<TenantSearchResponse>> searchTenants(
-      @Nullable String fromDate,
-      @Nullable String toDate,
-      Integer page,
-      Integer size,
-      String sort,
-      @Nullable TenantStatus tenantStatus,
-      @Nullable String tenantName)
-      throws TenantException;
+    ResponseEntity<PagedResponse<TenantSearchResponse>> searchTenants(
+            @Nullable String fromDate,
+            @Nullable String toDate,
+            Integer page,
+            Integer size,
+            String sort,
+            @Nullable TenantStatus tenantStatus,
+            @Nullable String tenantName)
+            throws TenantException;
 
-  ResponseEntity<PagedResponse<TenantSearchResponse>> searchTenantsByExternalId(
-      String externalId, Integer page, Integer size) throws TenantException;
+    ResponseEntity<PagedResponse<TenantSearchResponse>> searchTenantsByExternalId(
+            String externalId, Integer page, Integer size) throws TenantException;
 
-  ResponseEntity<TenantResponse> getTenantById(String id) throws TenantException;
+    ResponseEntity<TenantResponse> getTenantById(String id) throws TenantException;
 
-  ResponseEntity<TenantUpdateResponse> updateTenant(String id, TenantUpdateRequest request)
-      throws TenantException;
+    ResponseEntity<TenantUpdateResponse> updateTenant(String id, TenantUpdateRequest request) throws TenantException;
 
-  ResponseEntity<TenantPatchResponse> patchTenant(String id, TenantPatchRequest request)
-      throws TenantException;
+    ResponseEntity<TenantPatchResponse> patchTenant(String id, TenantPatchRequest request) throws TenantException;
 
-  ResponseEntity<Void> deleteTenant(String id) throws TenantException;
+    ResponseEntity<Void> deleteTenant(String id) throws TenantException;
 }

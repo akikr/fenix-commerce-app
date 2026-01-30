@@ -8,8 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface StoreRepository
-    extends JpaRepository<Store, UUID>, JpaSpecificationExecutor<Store> {
+public interface StoreRepository extends JpaRepository<Store, UUID>, JpaSpecificationExecutor<Store> {
 
-  Optional<Store> findByStoreIdAndTenantTenantId(UUID storeId, UUID tenantId);
+    Optional<Store> findByStoreIdAndTenantTenantId(UUID storeId, UUID tenantId);
 }

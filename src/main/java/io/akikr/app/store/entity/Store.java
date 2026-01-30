@@ -32,101 +32,101 @@ import lombok.Setter;
 @Table(name = "store")
 public class Store {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "store_id", columnDefinition = "BINARY(16)")
-  private UUID storeId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "store_id", columnDefinition = "BINARY(16)")
+    private UUID storeId;
 
-  @ManyToOne
-  @JoinColumn(name = "tenant_id", nullable = false)
-  private Tenant tenant;
+    @ManyToOne
+    @JoinColumn(name = "tenant_id", nullable = false)
+    private Tenant tenant;
 
-  @Column(name = "store_code", nullable = false, length = 100)
-  private String storeCode;
+    @Column(name = "store_code", nullable = false, length = 100)
+    private String storeCode;
 
-  @Column(name = "store_name", nullable = false, length = 255)
-  private String storeName;
+    @Column(name = "store_name", nullable = false, length = 255)
+    private String storeName;
 
-  @Column(name = "domain", length = 255)
-  private String domain;
+    @Column(name = "domain", length = 255)
+    private String domain;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "platform", nullable = false)
-  private Platform platform;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "platform", nullable = false)
+    private Platform platform;
 
-  @Column(name = "timezone", length = 64)
-  private String timezone;
+    @Column(name = "timezone", length = 64)
+    private String timezone;
 
-  @Column(name = "currency", length = 3)
-  private String currency;
+    @Column(name = "currency", length = 3)
+    private String currency;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "status", nullable = false)
-  private Status status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private Status status;
 
-  @Builder.Default
-  @Column(name = "created_at", nullable = false, updatable = false)
-  private LocalDateTime createdAt = LocalDateTime.now();
+    @Builder.Default
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-  @Builder.Default
-  @Column(name = "updated_at", nullable = false)
-  private LocalDateTime updatedAt = LocalDateTime.now();
+    @Builder.Default
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
-  @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  private List<Order> orders;
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Order> orders;
 
-  public Store() {}
+    public Store() {}
 
-  @Override
-  public String toString() {
-    return "Store{"
-        + "storeId="
-        + storeId
-        + ", tenant="
-        + tenant.getTenantId()
-        + ", storeCode='"
-        + storeCode
-        + '\''
-        + ", storeName='"
-        + storeName
-        + '\''
-        + ", domain='"
-        + domain
-        + '\''
-        + ", platform="
-        + platform
-        + ", status="
-        + status
-        + ", createdAt="
-        + createdAt
-        + ", updatedAt="
-        + updatedAt
-        + '}';
-  }
+    @Override
+    public String toString() {
+        return "Store{"
+                + "storeId="
+                + storeId
+                + ", tenant="
+                + tenant.getTenantId()
+                + ", storeCode='"
+                + storeCode
+                + '\''
+                + ", storeName='"
+                + storeName
+                + '\''
+                + ", domain='"
+                + domain
+                + '\''
+                + ", platform="
+                + platform
+                + ", status="
+                + status
+                + ", createdAt="
+                + createdAt
+                + ", updatedAt="
+                + updatedAt
+                + '}';
+    }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    Store store = (Store) o;
-    return Objects.equals(storeId, store.storeId);
-  }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Store store = (Store) o;
+        return Objects.equals(storeId, store.storeId);
+    }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(storeId);
-  }
+    @Override
+    public int hashCode() {
+        return Objects.hash(storeId);
+    }
 
-  public enum Platform {
-    SHOPIFY,
-    NETSUITE,
-    CUSTOM,
-    MAGENTO,
-    OTHER
-  }
+    public enum Platform {
+        SHOPIFY,
+        NETSUITE,
+        CUSTOM,
+        MAGENTO,
+        OTHER
+    }
 
-  public enum Status {
-    ACTIVE,
-    INACTIVE
-  }
+    public enum Status {
+        ACTIVE,
+        INACTIVE
+    }
 }

@@ -7,6 +7,5 @@ import org.springframework.http.ResponseEntity;
 
 public interface OrderCommandService {
 
-  ResponseEntity<OrderUpsertResponse> upsertOrder(OrderUpsertRequest orderUpsertRequest)
-      throws OrderException;
+    ResponseEntity<OrderUpsertResponse> upsertOrder(OrderUpsertRequest orderUpsertRequest) throws OrderException;
 }

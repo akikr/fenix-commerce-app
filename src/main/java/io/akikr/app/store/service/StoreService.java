@@ -17,40 +17,39 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 
 public interface StoreService {
-  ResponseEntity<StoreCreateResponse> createStore(String orgId, StoreCreateRequest request)
-      throws StoreException;
+    ResponseEntity<StoreCreateResponse> createStore(String orgId, StoreCreateRequest request) throws StoreException;
 
-  ResponseEntity<PagedResponse<StoreSearchResponse>> listStores(
-      String orgId,
-      @Nullable String fromDate,
-      @Nullable String toDate,
-      Integer page,
-      Integer size,
-      String sort,
-      @Nullable StoreStatus status,
-      @Nullable StorePlatform platform,
-      @Nullable String code,
-      @Nullable String domain)
-      throws StoreException;
+    ResponseEntity<PagedResponse<StoreSearchResponse>> listStores(
+            String orgId,
+            @Nullable String fromDate,
+            @Nullable String toDate,
+            Integer page,
+            Integer size,
+            String sort,
+            @Nullable StoreStatus status,
+            @Nullable StorePlatform platform,
+            @Nullable String code,
+            @Nullable String domain)
+            throws StoreException;
 
-  ResponseEntity<PagedResponse<StoreSearchResponse>> searchStores(
-      String orgId,
-      @Nullable String websiteId,
-      @Nullable String code,
-      @Nullable String domain,
-      Integer page,
-      Integer size)
-      throws StoreException;
+    ResponseEntity<PagedResponse<StoreSearchResponse>> searchStores(
+            String orgId,
+            @Nullable String websiteId,
+            @Nullable String code,
+            @Nullable String domain,
+            Integer page,
+            Integer size)
+            throws StoreException;
 
-  ResponseEntity<StoreResponse> getStoreById(String orgId, String websiteId) throws StoreException;
+    ResponseEntity<StoreResponse> getStoreById(String orgId, String websiteId) throws StoreException;
 
-  ResponseEntity<StoreUpdateResponse> updateStore(
-      String orgId, String websiteId, StoreUpdateRequest request) throws StoreException;
+    ResponseEntity<StoreUpdateResponse> updateStore(String orgId, String websiteId, StoreUpdateRequest request)
+            throws StoreException;
 
-  ResponseEntity<StorePatchResponse> patchStore(
-      String orgId, String websiteId, StorePatchRequest request) throws StoreException;
+    ResponseEntity<StorePatchResponse> patchStore(String orgId, String websiteId, StorePatchRequest request)
+            throws StoreException;
 
-  ResponseEntity<Void> deleteStore(String orgId, String websiteId) throws StoreException;
+    ResponseEntity<Void> deleteStore(String orgId, String websiteId) throws StoreException;
 
-  Store verifyStoreBelongsToTenant(String orgId, String storeId) throws StoreException;
+    Store verifyStoreBelongsToTenant(String orgId, String storeId) throws StoreException;
 }

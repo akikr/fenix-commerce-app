@@ -10,25 +10,25 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 
 public interface OrderQueryService {
-  ResponseEntity<PagedResponse<OrderSearchResponse>> searchOrderByExternal(
-      String orgId,
-      @Nullable String websiteId,
-      @Nullable String externalOrderId,
-      @Nullable String externalOrderNumber,
-      int page,
-      int size)
-      throws OrderException;
+    ResponseEntity<PagedResponse<OrderSearchResponse>> searchOrderByExternal(
+            String orgId,
+            @Nullable String websiteId,
+            @Nullable String externalOrderId,
+            @Nullable String externalOrderNumber,
+            int page,
+            int size)
+            throws OrderException;
 
-  ResponseEntity<PagedResponse<OrderSearchResponse>> searchOrders(
-      String orgId,
-      @Nullable String websiteId,
-      @Nullable OrderStatus orderStatus,
-      @Nullable FinancialStatus financialStatus,
-      @Nullable FulfillmentStatus fulfillmentStatus,
-      @Nullable String fromDate,
-      @Nullable String toDate,
-      int page,
-      int size,
-      String sort)
-      throws OrderException;
+    ResponseEntity<PagedResponse<OrderSearchResponse>> searchOrders(
+            String orgId,
+            @Nullable String websiteId,
+            @Nullable OrderStatus orderStatus,
+            @Nullable FinancialStatus financialStatus,
+            @Nullable FulfillmentStatus fulfillmentStatus,
+            @Nullable String fromDate,
+            @Nullable String toDate,
+            int page,
+            int size,
+            String sort)
+            throws OrderException;
 }

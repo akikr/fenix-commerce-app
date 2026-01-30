@@ -32,164 +32,148 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 class TenantControllerTest extends MySqlTestContainer {
 
-  @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-  @Autowired private TenantRepository tenantRepository;
+    @Autowired
+    private TenantRepository tenantRepository;
 
-  @Autowired private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-  private Tenant activeTenant;
+    private Tenant activeTenant;
 
-  @BeforeEach
-  void setUp() {
-    tenantRepository.deleteAll();
-    activeTenant =
-        Tenant.builder()
-            .tenantName("active-tenant")
-            .externalId("active-tenant-ext-id")
-            .status(Tenant.Status.ACTIVE)
-            .createdAt(LocalDateTime.now())
-            .updatedAt(LocalDateTime.now())
-            .build();
-    tenantRepository.save(activeTenant);
-  }
+    @BeforeEach
+    void setUp() {
+        tenantRepository.deleteAll();
+        activeTenant = Tenant.builder()
+                .tenantName("active-tenant")
+                .externalId("active-tenant-ext-id")
+                .status(Tenant.Status.ACTIVE)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        tenantRepository.save(activeTenant);
+    }
 
-  @Test
-  @DisplayName("API Test: createTenant - Success")
-  void createTenant_Success() throws Exception {
-    // Arrange
-    var request = new TenantCreateRequest("new-tenant-ext-id", "new-tenant", TenantStatus.ACTIVE);
+    @Test
+    @DisplayName("API Test: createTenant - Success")
+    void createTenant_Success() throws Exception {
+        // Arrange
+        var request = new TenantCreateRequest("new-tenant-ext-id", "new-tenant", TenantStatus.ACTIVE);
 
-    // Act & Assert
-    mockMvc
-        .perform(
-            post("/organizations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.externalId").value("new-tenant-ext-id"));
-  }
+        // Act & Assert
+        mockMvc.perform(post("/organizations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.externalId").value("new-tenant-ext-id"));
+    }
 
-  @Test
-  @DisplayName("API Test: getTenantById - Success")
-  void getTenantById_Success() throws Exception {
-    // Act & Assert
-    mockMvc
-        .perform(get("/organizations/{id}", activeTenant.getTenantId()))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.externalId").value(activeTenant.getExternalId()));
-  }
+    @Test
+    @DisplayName("API Test: getTenantById - Success")
+    void getTenantById_Success() throws Exception {
+        // Act & Assert
+        mockMvc.perform(get("/organizations/{id}", activeTenant.getTenantId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.externalId").value(activeTenant.getExternalId()));
+    }
 
-  @Test
-  @DisplayName("API Test: getTenantById - Not Found")
-  void getTenantById_NotFound() throws Exception {
-    // Act & Assert
-    mockMvc.perform(get("/organizations/{id}", UUID.randomUUID())).andExpect(status().isNotFound());
-  }
+    @Test
+    @DisplayName("API Test: getTenantById - Not Found")
+    void getTenantById_NotFound() throws Exception {
+        // Act & Assert
+        mockMvc.perform(get("/organizations/{id}", UUID.randomUUID())).andExpect(status().isNotFound());
+    }
 
-  @Test
-  @DisplayName("API Test: searchTenants - Success")
-  void searchTenants_Success() throws Exception {
-    // Act & Assert
-    mockMvc
-        .perform(get("/organizations").param("name", "active"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.data", hasSize(1)));
-  }
+    @Test
+    @DisplayName("API Test: searchTenants - Success")
+    void searchTenants_Success() throws Exception {
+        // Act & Assert
+        mockMvc.perform(get("/organizations").param("name", "active"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", hasSize(1)));
+    }
 
-  @Test
-  @DisplayName("API Test: searchTenants - No Results")
-  void searchTenants_NoResults() throws Exception {
-    // Act & Assert
-    mockMvc
-        .perform(get("/organizations").param("name", "non-existent"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.data", hasSize(0)));
-  }
+    @Test
+    @DisplayName("API Test: searchTenants - No Results")
+    void searchTenants_NoResults() throws Exception {
+        // Act & Assert
+        mockMvc.perform(get("/organizations").param("name", "non-existent"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", hasSize(0)));
+    }
 
-  @Test
-  @DisplayName("API Test: updateTenant - Success")
-  void updateTenant_Success() throws Exception {
-    // Arrange
-    TenantUpdateRequest request =
-        new TenantUpdateRequest(
-            activeTenant.getExternalId(), "updated-name", TenantStatus.INACTIVE);
+    @Test
+    @DisplayName("API Test: updateTenant - Success")
+    void updateTenant_Success() throws Exception {
+        // Arrange
+        TenantUpdateRequest request =
+                new TenantUpdateRequest(activeTenant.getExternalId(), "updated-name", TenantStatus.INACTIVE);
 
-    // Act & Assert
-    mockMvc
-        .perform(
-            put("/organizations/{id}", activeTenant.getTenantId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.name").value("updated-name"))
-        .andExpect(jsonPath("$.status").value("INACTIVE"));
-  }
+        // Act & Assert
+        mockMvc.perform(put("/organizations/{id}", activeTenant.getTenantId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("updated-name"))
+                .andExpect(jsonPath("$.status").value("INACTIVE"));
+    }
 
-  @Test
-  @DisplayName("API Test: updateTenant - Not Found")
-  void updateTenant_NotFound() throws Exception {
-    // Arrange
-    TenantUpdateRequest request =
-        new TenantUpdateRequest("ext-id", "updated-name", TenantStatus.INACTIVE);
+    @Test
+    @DisplayName("API Test: updateTenant - Not Found")
+    void updateTenant_NotFound() throws Exception {
+        // Arrange
+        TenantUpdateRequest request = new TenantUpdateRequest("ext-id", "updated-name", TenantStatus.INACTIVE);
 
-    // Act & Assert
-    mockMvc
-        .perform(
-            put("/organizations/{id}", UUID.randomUUID())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().is5xxServerError());
-  }
+        // Act & Assert
+        mockMvc.perform(put("/organizations/{id}", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().is5xxServerError());
+    }
 
-  @Test
-  @DisplayName("API Test: patchTenant - Success")
-  void patchTenant_Success() throws Exception {
-    // Arrange
-    TenantPatchRequest request =
-        new TenantPatchRequest(activeTenant.getExternalId(), "patched-name", TenantStatus.INACTIVE);
+    @Test
+    @DisplayName("API Test: patchTenant - Success")
+    void patchTenant_Success() throws Exception {
+        // Arrange
+        TenantPatchRequest request =
+                new TenantPatchRequest(activeTenant.getExternalId(), "patched-name", TenantStatus.INACTIVE);
 
-    // Act & Assert
-    mockMvc
-        .perform(
-            patch("/organizations/{id}", activeTenant.getTenantId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.name").value("patched-name"))
-        .andExpect(jsonPath("$.status").value(TenantStatus.INACTIVE.name()));
-  }
+        // Act & Assert
+        mockMvc.perform(patch("/organizations/{id}", activeTenant.getTenantId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("patched-name"))
+                .andExpect(jsonPath("$.status").value(TenantStatus.INACTIVE.name()));
+    }
 
-  @Test
-  @DisplayName("API Test: patchTenant - Not Found")
-  void patchTenant_NotFound() throws Exception {
-    // Arrange
-    TenantPatchRequest request = new TenantPatchRequest("ext-id", "patched-name", null);
+    @Test
+    @DisplayName("API Test: patchTenant - Not Found")
+    void patchTenant_NotFound() throws Exception {
+        // Arrange
+        TenantPatchRequest request = new TenantPatchRequest("ext-id", "patched-name", null);
 
-    // Act & Assert
-    mockMvc
-        .perform(
-            patch("/organizations/{id}", UUID.randomUUID())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().is5xxServerError());
-  }
+        // Act & Assert
+        mockMvc.perform(patch("/organizations/{id}", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().is5xxServerError());
+    }
 
-  @Test
-  @DisplayName("API Test: deleteTenant - Success")
-  void deleteTenant_Success() throws Exception {
-    // Act & Assert
-    mockMvc
-        .perform(delete("/organizations/{id}", activeTenant.getTenantId()))
-        .andExpect(status().isNoContent());
-  }
+    @Test
+    @DisplayName("API Test: deleteTenant - Success")
+    void deleteTenant_Success() throws Exception {
+        // Act & Assert
+        mockMvc.perform(delete("/organizations/{id}", activeTenant.getTenantId()))
+                .andExpect(status().isNoContent());
+    }
 
-  @Test
-  @DisplayName("API Test: deleteTenant - Not Found")
-  void deleteTenant_NotFound() throws Exception {
-    // Act & Assert
-    mockMvc
-        .perform(delete("/organizations/{id}", UUID.randomUUID()))
-        .andExpect(status().is5xxServerError());
-  }
+    @Test
+    @DisplayName("API Test: deleteTenant - Not Found")
+    void deleteTenant_NotFound() throws Exception {
+        // Act & Assert
+        mockMvc.perform(delete("/organizations/{id}", UUID.randomUUID())).andExpect(status().is5xxServerError());
+    }
 }

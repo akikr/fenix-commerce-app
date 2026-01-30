@@ -10,17 +10,18 @@ import org.springframework.context.ApplicationContext;
 @SpringBootTest
 class FenixCommerceAppTests extends MySqlTestContainer {
 
-  @Autowired private ApplicationContext applicationContext;
+    @Autowired
+    private ApplicationContext applicationContext;
 
-  @Test
-  void contextLoads() {
-    // Act
-    FenixCommerceApp applicationContextBean = applicationContext.getBean(FenixCommerceApp.class);
+    @Test
+    void contextLoads() {
+        // Act
+        FenixCommerceApp applicationContextBean = applicationContext.getBean(FenixCommerceApp.class);
 
-    // Assert
-    assertThat(applicationContextBean).isNotNull();
+        // Assert
+        assertThat(applicationContextBean).isNotNull();
 
-    // Verify MySQL container is running
-    assertThat(mySqlContainer.isRunning()).isTrue();
-  }
+        // Verify MySQL container is running
+        assertThat(mySqlContainer.isRunning()).isTrue();
+    }
 }

@@ -25,254 +25,250 @@ import org.springframework.data.jpa.domain.Specification;
 @DataJpaTest
 class TenantRepositoryTest extends MySqlTestContainer {
 
-  @Autowired private TenantRepository tenantRepository;
+    @Autowired
+    private TenantRepository tenantRepository;
 
-  @Autowired private TestEntityManager entityManager;
+    @Autowired
+    private TestEntityManager entityManager;
 
-  private Tenant tenant1;
-  private Tenant tenant2;
-  private String externalId1;
-  private String externalId2;
+    private Tenant tenant1;
+    private Tenant tenant2;
+    private String externalId1;
+    private String externalId2;
 
-  @BeforeEach
-  void setUp() {
-    externalId1 = "ext-" + UUID.randomUUID();
-    tenant1 =
-        Tenant.builder()
-            .tenantName("test-tenant-1")
-            .externalId(externalId1)
-            .status(Tenant.Status.ACTIVE)
-            .createdAt(LocalDateTime.now().minusDays(2))
-            .build();
+    @BeforeEach
+    void setUp() {
+        externalId1 = "ext-" + UUID.randomUUID();
+        tenant1 = Tenant.builder()
+                .tenantName("test-tenant-1")
+                .externalId(externalId1)
+                .status(Tenant.Status.ACTIVE)
+                .createdAt(LocalDateTime.now().minusDays(2))
+                .build();
 
-    externalId2 = "ext-" + UUID.randomUUID();
-    tenant2 =
-        Tenant.builder()
-            .tenantName("test-tenant-2")
-            .externalId(externalId2)
-            .status(Tenant.Status.INACTIVE)
-            .createdAt(LocalDateTime.now().minusDays(1))
-            .build();
-    Tenant tenant3 =
-        Tenant.builder()
-            .tenantName("another-tenant")
-            .externalId("ext-" + UUID.randomUUID())
-            .status(Tenant.Status.ACTIVE)
-            .createdAt(LocalDateTime.now())
-            .build();
+        externalId2 = "ext-" + UUID.randomUUID();
+        tenant2 = Tenant.builder()
+                .tenantName("test-tenant-2")
+                .externalId(externalId2)
+                .status(Tenant.Status.INACTIVE)
+                .createdAt(LocalDateTime.now().minusDays(1))
+                .build();
+        Tenant tenant3 = Tenant.builder()
+                .tenantName("another-tenant")
+                .externalId("ext-" + UUID.randomUUID())
+                .status(Tenant.Status.ACTIVE)
+                .createdAt(LocalDateTime.now())
+                .build();
 
-    entityManager.persist(tenant1);
-    entityManager.persist(tenant2);
-    entityManager.persist(tenant3);
-    entityManager.flush();
-  }
+        entityManager.persist(tenant1);
+        entityManager.persist(tenant2);
+        entityManager.persist(tenant3);
+        entityManager.flush();
+    }
 
-  @Test
-  @DisplayName("Test findByTenantId - Success")
-  void testFindByTenantId_Success() {
-    // Arrange
-    UUID tenantId = tenant1.getTenantId();
+    @Test
+    @DisplayName("Test findByTenantId - Success")
+    void testFindByTenantId_Success() {
+        // Arrange
+        UUID tenantId = tenant1.getTenantId();
 
-    // Act
-    Optional<Tenant> foundTenant = tenantRepository.findByTenantId(tenantId);
+        // Act
+        Optional<Tenant> foundTenant = tenantRepository.findByTenantId(tenantId);
 
-    // Assert
-    assertTrue(foundTenant.isPresent());
-    assertEquals(tenantId, foundTenant.get().getTenantId());
-  }
+        // Assert
+        assertTrue(foundTenant.isPresent());
+        assertEquals(tenantId, foundTenant.get().getTenantId());
+    }
 
-  @Test
-  @DisplayName("Test findByTenantId - Not Found")
-  void testFindByTenantId_NotFound() {
-    // Arrange
-    UUID nonExistentTenantId = UUID.randomUUID();
+    @Test
+    @DisplayName("Test findByTenantId - Not Found")
+    void testFindByTenantId_NotFound() {
+        // Arrange
+        UUID nonExistentTenantId = UUID.randomUUID();
 
-    // Act
-    Optional<Tenant> foundTenant = tenantRepository.findByTenantId(nonExistentTenantId);
+        // Act
+        Optional<Tenant> foundTenant = tenantRepository.findByTenantId(nonExistentTenantId);
 
-    // Assert
-    assertFalse(foundTenant.isPresent());
-  }
+        // Assert
+        assertFalse(foundTenant.isPresent());
+    }
 
-  @Test
-  @DisplayName("Test findByExternalId - Success")
-  void testFindByExternalId_Success() {
-    // Arrange
-    PageRequest pageable = PageRequest.of(0, 10);
+    @Test
+    @DisplayName("Test findByExternalId - Success")
+    void testFindByExternalId_Success() {
+        // Arrange
+        PageRequest pageable = PageRequest.of(0, 10);
 
-    // Act
-    Page<Tenant> foundTenants = tenantRepository.findByExternalId(externalId1, pageable);
+        // Act
+        Page<Tenant> foundTenants = tenantRepository.findByExternalId(externalId1, pageable);
 
-    // Assert
-    assertEquals(1, foundTenants.getTotalElements());
-    assertEquals(externalId1, foundTenants.getContent().get(0).getExternalId());
-  }
+        // Assert
+        assertEquals(1, foundTenants.getTotalElements());
+        assertEquals(externalId1, foundTenants.getContent().get(0).getExternalId());
+    }
 
-  @Test
-  @DisplayName("Test findByExternalId - Not Found")
-  void testFindByExternalId_NotFound() {
-    // Arrange
-    String nonExistentExternalId = "ext-non-existent";
-    PageRequest pageable = PageRequest.of(0, 10);
+    @Test
+    @DisplayName("Test findByExternalId - Not Found")
+    void testFindByExternalId_NotFound() {
+        // Arrange
+        String nonExistentExternalId = "ext-non-existent";
+        PageRequest pageable = PageRequest.of(0, 10);
 
-    // Act
-    Page<Tenant> foundTenants = tenantRepository.findByExternalId(nonExistentExternalId, pageable);
+        // Act
+        Page<Tenant> foundTenants = tenantRepository.findByExternalId(nonExistentExternalId, pageable);
 
-    // Assert
-    assertTrue(foundTenants.isEmpty());
-  }
+        // Assert
+        assertTrue(foundTenants.isEmpty());
+    }
 
-  @Test
-  @DisplayName("Test findByTenantId with Pageable - Success")
-  void testFindByTenantIdWithPaginatedResults_Success() {
-    // Arrange
-    UUID tenantId = tenant1.getTenantId();
-    PageRequest pageable = PageRequest.of(0, 10);
+    @Test
+    @DisplayName("Test findByTenantId with Pageable - Success")
+    void testFindByTenantIdWithPaginatedResults_Success() {
+        // Arrange
+        UUID tenantId = tenant1.getTenantId();
+        PageRequest pageable = PageRequest.of(0, 10);
 
-    // Act
-    Page<Tenant> foundTenants = tenantRepository.findByTenantId(tenantId, pageable);
+        // Act
+        Page<Tenant> foundTenants = tenantRepository.findByTenantId(tenantId, pageable);
 
-    // Assert
-    assertEquals(1, foundTenants.getTotalElements());
-    assertEquals(tenantId, foundTenants.getContent().get(0).getTenantId());
-  }
+        // Assert
+        assertEquals(1, foundTenants.getTotalElements());
+        assertEquals(tenantId, foundTenants.getContent().get(0).getTenantId());
+    }
 
-  @Test
-  @DisplayName("Test findByTenantId with Pageable - Not Found")
-  void testFindByTenantIdWithPaginatedResults_NotFound() {
-    // Arrange
-    UUID nonExistentTenantId = UUID.randomUUID();
-    PageRequest pageable = PageRequest.of(0, 10);
+    @Test
+    @DisplayName("Test findByTenantId with Pageable - Not Found")
+    void testFindByTenantIdWithPaginatedResults_NotFound() {
+        // Arrange
+        UUID nonExistentTenantId = UUID.randomUUID();
+        PageRequest pageable = PageRequest.of(0, 10);
 
-    // Act
-    Page<Tenant> foundTenants = tenantRepository.findByTenantId(nonExistentTenantId, pageable);
+        // Act
+        Page<Tenant> foundTenants = tenantRepository.findByTenantId(nonExistentTenantId, pageable);
 
-    // Assert
-    assertTrue(foundTenants.isEmpty());
-  }
+        // Assert
+        assertTrue(foundTenants.isEmpty());
+    }
 
-  @Test
-  @DisplayName("Test save new tenant - Success")
-  void testSaveNewTenant_Success() {
-    // Arrange
-    Tenant newTenant =
-        Tenant.builder().tenantName("new-tenant").externalId("ext-" + UUID.randomUUID()).build();
+    @Test
+    @DisplayName("Test save new tenant - Success")
+    void testSaveNewTenant_Success() {
+        // Arrange
+        Tenant newTenant = Tenant.builder()
+                .tenantName("new-tenant")
+                .externalId("ext-" + UUID.randomUUID())
+                .build();
 
-    // Act
-    Tenant savedTenant = tenantRepository.save(newTenant);
+        // Act
+        Tenant savedTenant = tenantRepository.save(newTenant);
 
-    // Assert
-    assertNotNull(savedTenant);
-    assertEquals("new-tenant", savedTenant.getTenantName());
-  }
+        // Assert
+        assertNotNull(savedTenant);
+        assertEquals("new-tenant", savedTenant.getTenantName());
+    }
 
-  @Test
-  @DisplayName("Test update existing tenant - Success")
-  void testUpdateTenant_Success() {
-    // Arrange
-    tenant1.setTenantName("updated-tenant-name");
+    @Test
+    @DisplayName("Test update existing tenant - Success")
+    void testUpdateTenant_Success() {
+        // Arrange
+        tenant1.setTenantName("updated-tenant-name");
 
-    // Act
-    Tenant updatedTenant = tenantRepository.save(tenant1);
+        // Act
+        Tenant updatedTenant = tenantRepository.save(tenant1);
 
-    // Assert
-    assertNotNull(updatedTenant);
-    assertEquals("updated-tenant-name", updatedTenant.getTenantName());
-  }
+        // Assert
+        assertNotNull(updatedTenant);
+        assertEquals("updated-tenant-name", updatedTenant.getTenantName());
+    }
 
-  @Test
-  @DisplayName("Test findAll with tenantName filter")
-  void testFindAll_withTenantNameFilter() {
-    // Arrange
-    Specification<Tenant> spec =
-        TenantSpecifications.withOptionalFilters(null, null, null, "test-tenant");
-    PageRequest pageable = PageRequest.of(0, 10);
+    @Test
+    @DisplayName("Test findAll with tenantName filter")
+    void testFindAll_withTenantNameFilter() {
+        // Arrange
+        Specification<Tenant> spec = TenantSpecifications.withOptionalFilters(null, null, null, "test-tenant");
+        PageRequest pageable = PageRequest.of(0, 10);
 
-    // Act
-    Page<Tenant> result = tenantRepository.findAll(spec, pageable);
+        // Act
+        Page<Tenant> result = tenantRepository.findAll(spec, pageable);
 
-    // Assert
-    assertEquals(2, result.getTotalElements());
-    assertTrue(
-        result.getContent().stream().allMatch(t -> t.getTenantName().contains("test-tenant")));
-  }
+        // Assert
+        assertEquals(2, result.getTotalElements());
+        assertTrue(result.getContent().stream().allMatch(t -> t.getTenantName().contains("test-tenant")));
+    }
 
-  @Test
-  @DisplayName("Test findAll with statusCode filter")
-  void testFindAll_withStatusFilter() {
-    // Arrange
-    Specification<Tenant> spec =
-        TenantSpecifications.withOptionalFilters(null, null, TenantStatus.INACTIVE, null);
-    PageRequest pageable = PageRequest.of(0, 10);
+    @Test
+    @DisplayName("Test findAll with statusCode filter")
+    void testFindAll_withStatusFilter() {
+        // Arrange
+        Specification<Tenant> spec = TenantSpecifications.withOptionalFilters(null, null, TenantStatus.INACTIVE, null);
+        PageRequest pageable = PageRequest.of(0, 10);
 
-    // Act
-    Page<Tenant> result = tenantRepository.findAll(spec, pageable);
+        // Act
+        Page<Tenant> result = tenantRepository.findAll(spec, pageable);
 
-    // Assert
-    assertEquals(1, result.getTotalElements());
-    assertEquals(tenant2, result.getContent().get(0));
-  }
+        // Assert
+        assertEquals(1, result.getTotalElements());
+        assertEquals(tenant2, result.getContent().get(0));
+    }
 
-  @Test
-  @DisplayName("Test findAll with date range filter")
-  void testFindAll_withDateRangeFilter() {
-    // Arrange
-    DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-    String fromDate = LocalDateTime.now().minusDays(3).format(formatter);
-    String toDate = LocalDateTime.now().minusDays(1).plusHours(1).format(formatter);
-    Specification<Tenant> spec =
-        TenantSpecifications.withOptionalFilters(fromDate, toDate, null, null);
-    PageRequest pageable = PageRequest.of(0, 10);
+    @Test
+    @DisplayName("Test findAll with date range filter")
+    void testFindAll_withDateRangeFilter() {
+        // Arrange
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        String fromDate = LocalDateTime.now().minusDays(3).format(formatter);
+        String toDate = LocalDateTime.now().minusDays(1).plusHours(1).format(formatter);
+        Specification<Tenant> spec = TenantSpecifications.withOptionalFilters(fromDate, toDate, null, null);
+        PageRequest pageable = PageRequest.of(0, 10);
 
-    // Act
-    Page<Tenant> result = tenantRepository.findAll(spec, pageable);
+        // Act
+        Page<Tenant> result = tenantRepository.findAll(spec, pageable);
 
-    // Assert
-    assertEquals(2, result.getTotalElements());
-  }
+        // Assert
+        assertEquals(2, result.getTotalElements());
+    }
 
-  @Test
-  @DisplayName("Test findAll with combined filters")
-  void testFindAll_withCombinedFilters() {
-    // Arrange
-    Specification<Tenant> spec =
-        TenantSpecifications.withOptionalFilters(null, null, TenantStatus.ACTIVE, "test-tenant");
-    PageRequest pageable = PageRequest.of(0, 10);
+    @Test
+    @DisplayName("Test findAll with combined filters")
+    void testFindAll_withCombinedFilters() {
+        // Arrange
+        Specification<Tenant> spec =
+                TenantSpecifications.withOptionalFilters(null, null, TenantStatus.ACTIVE, "test-tenant");
+        PageRequest pageable = PageRequest.of(0, 10);
 
-    // Act
-    Page<Tenant> result = tenantRepository.findAll(spec, pageable);
+        // Act
+        Page<Tenant> result = tenantRepository.findAll(spec, pageable);
 
-    // Assert
-    assertEquals(1, result.getTotalElements());
-    assertEquals(tenant1, result.getContent().get(0));
-  }
+        // Assert
+        assertEquals(1, result.getTotalElements());
+        assertEquals(tenant1, result.getContent().get(0));
+    }
 
-  @Test
-  @DisplayName("Test findAll with no filters")
-  void testFindAll_withNoFilters() {
-    // Arrange
-    Specification<Tenant> spec = TenantSpecifications.withOptionalFilters(null, null, null, null);
-    PageRequest pageable = PageRequest.of(0, 10);
+    @Test
+    @DisplayName("Test findAll with no filters")
+    void testFindAll_withNoFilters() {
+        // Arrange
+        Specification<Tenant> spec = TenantSpecifications.withOptionalFilters(null, null, null, null);
+        PageRequest pageable = PageRequest.of(0, 10);
 
-    // Act
-    Page<Tenant> result = tenantRepository.findAll(spec, pageable);
+        // Act
+        Page<Tenant> result = tenantRepository.findAll(spec, pageable);
 
-    // Assert
-    assertEquals(3, result.getTotalElements());
-  }
+        // Assert
+        assertEquals(3, result.getTotalElements());
+    }
 
-  @Test
-  @DisplayName("Test findAll with no results")
-  void testFindAll_withNoResults() {
-    // Arrange
-    Specification<Tenant> spec =
-        TenantSpecifications.withOptionalFilters(null, null, null, "non-existent");
-    PageRequest pageable = PageRequest.of(0, 10);
+    @Test
+    @DisplayName("Test findAll with no results")
+    void testFindAll_withNoResults() {
+        // Arrange
+        Specification<Tenant> spec = TenantSpecifications.withOptionalFilters(null, null, null, "non-existent");
+        PageRequest pageable = PageRequest.of(0, 10);
 
-    // Act
-    Page<Tenant> result = tenantRepository.findAll(spec, pageable);
+        // Act
+        Page<Tenant> result = tenantRepository.findAll(spec, pageable);
 
-    // Assert
-    assertTrue(result.isEmpty());
-  }
+        // Assert
+        assertTrue(result.isEmpty());
+    }
 }

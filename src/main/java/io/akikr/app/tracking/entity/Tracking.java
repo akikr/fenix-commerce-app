@@ -32,95 +32,95 @@ import lombok.Setter;
 @Table(name = "tracking")
 public class Tracking {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "tracking_id", columnDefinition = "BINARY(16)")
-  private UUID trackingId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "tracking_id", columnDefinition = "BINARY(16)")
+    private UUID trackingId;
 
-  @ManyToOne
-  @JoinColumn(name = "tenant_id", nullable = false)
-  private Tenant tenant;
+    @ManyToOne
+    @JoinColumn(name = "tenant_id", nullable = false)
+    private Tenant tenant;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "fulfillment_id", nullable = false)
-  private Fulfillment fulfillment;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fulfillment_id", nullable = false)
+    private Fulfillment fulfillment;
 
-  @Column(name = "tracking_number", nullable = false, length = 128)
-  private String trackingNumber;
+    @Column(name = "tracking_number", nullable = false, length = 128)
+    private String trackingNumber;
 
-  @Column(name = "tracking_url", length = 1024)
-  private String trackingUrl;
+    @Column(name = "tracking_url", length = 1024)
+    private String trackingUrl;
 
-  @Column(name = "carrier", length = 64)
-  private String carrier;
+    @Column(name = "carrier", length = 64)
+    private String carrier;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "tracking_status", nullable = false)
-  private TrackingStatus trackingStatus;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tracking_status", nullable = false)
+    private TrackingStatus trackingStatus;
 
-  @Column(name = "is_primary", nullable = false)
-  private boolean isPrimary;
+    @Column(name = "is_primary", nullable = false)
+    private boolean isPrimary;
 
-  @Column(name = "last_event_at")
-  private LocalDateTime lastEventAt;
+    @Column(name = "last_event_at")
+    private LocalDateTime lastEventAt;
 
-  @Builder.Default
-  @Column(name = "created_at", nullable = false, updatable = false)
-  private LocalDateTime createdAt = LocalDateTime.now();
+    @Builder.Default
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-  @Builder.Default
-  @Column(name = "updated_at", nullable = false)
-  private LocalDateTime updatedAt = LocalDateTime.now();
+    @Builder.Default
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
-  @OneToMany(mappedBy = "tracking", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  private List<TrackingEvent> trackingEvents;
+    @OneToMany(mappedBy = "tracking", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TrackingEvent> trackingEvents;
 
-  public Tracking() {}
+    public Tracking() {}
 
-  @Override
-  public String toString() {
-    return "Tracking{"
-        + "trackingId="
-        + trackingId
-        + ", tenantId="
-        + tenant.getTenantId()
-        + ", fulfillment="
-        + fulfillment.getFulfillmentId()
-        + ", trackingNumber='"
-        + trackingNumber
-        + '\''
-        + ", trackingStatus="
-        + trackingStatus
-        + ", isPrimary="
-        + isPrimary
-        + ", lastEventAt="
-        + lastEventAt
-        + ", createdAt="
-        + createdAt
-        + ", updatedAt="
-        + updatedAt
-        + '}';
-  }
+    @Override
+    public String toString() {
+        return "Tracking{"
+                + "trackingId="
+                + trackingId
+                + ", tenantId="
+                + tenant.getTenantId()
+                + ", fulfillment="
+                + fulfillment.getFulfillmentId()
+                + ", trackingNumber='"
+                + trackingNumber
+                + '\''
+                + ", trackingStatus="
+                + trackingStatus
+                + ", isPrimary="
+                + isPrimary
+                + ", lastEventAt="
+                + lastEventAt
+                + ", createdAt="
+                + createdAt
+                + ", updatedAt="
+                + updatedAt
+                + '}';
+    }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    Tracking tracking = (Tracking) o;
-    return Objects.equals(trackingId, tracking.trackingId);
-  }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tracking tracking = (Tracking) o;
+        return Objects.equals(trackingId, tracking.trackingId);
+    }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(trackingId);
-  }
+    @Override
+    public int hashCode() {
+        return Objects.hash(trackingId);
+    }
 
-  public enum TrackingStatus {
-    LABEL_CREATED,
-    IN_TRANSIT,
-    OUT_FOR_DELIVERY,
-    DELIVERED,
-    EXCEPTION,
-    UNKNOWN
-  }
+    public enum TrackingStatus {
+        LABEL_CREATED,
+        IN_TRANSIT,
+        OUT_FOR_DELIVERY,
+        DELIVERED,
+        EXCEPTION,
+        UNKNOWN
+    }
 }

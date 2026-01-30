@@ -29,82 +29,73 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Websites")
 @RestController
-@RequestMapping(
-    path = "/organizations/{orgId}/websites",
-    produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/organizations/{orgId}/websites", produces = MediaType.APPLICATION_JSON_VALUE)
 public class StoreController {
 
-  private final StoreService storeService;
+    private final StoreService storeService;
 
-  public StoreController(StoreService storeService) {
-    this.storeService = storeService;
-  }
+    public StoreController(StoreService storeService) {
+        this.storeService = storeService;
+    }
 
-  @Operation(summary = "Create website for organization")
-  @PostMapping
-  public ResponseEntity<StoreCreateResponse> createStore(
-      @PathVariable String orgId, @RequestBody StoreCreateRequest request) {
-    return storeService.createStore(orgId, request);
-  }
+    @Operation(summary = "Create website for organization")
+    @PostMapping
+    public ResponseEntity<StoreCreateResponse> createStore(
+            @PathVariable String orgId, @RequestBody StoreCreateRequest request) {
+        return storeService.createStore(orgId, request);
+    }
 
-  @Operation(summary = "List/search websites for organization (date range + pagination)")
-  @GetMapping
-  public ResponseEntity<PagedResponse<StoreSearchResponse>> listStores(
-      @PathVariable String orgId,
-      @RequestParam(name = "from", required = false) String fromDate,
-      @RequestParam(name = "to", required = false) String toDate,
-      @RequestParam(name = "page", defaultValue = "0") int page,
-      @RequestParam(name = "size", defaultValue = "50") int size,
-      @RequestParam(name = "sort", defaultValue = "updatedAt,desc") String sort,
-      @RequestParam(name = "status", required = false) StoreStatus status,
-      @RequestParam(name = "platform", required = false) StorePlatform platform,
-      @RequestParam(name = "code", required = false) String code,
-      @RequestParam(name = "domain", required = false) String domain) {
-    return storeService.listStores(
-        orgId, fromDate, toDate, page, size, sort, status, platform, code, domain);
-  }
+    @Operation(summary = "List/search websites for organization (date range + pagination)")
+    @GetMapping
+    public ResponseEntity<PagedResponse<StoreSearchResponse>> listStores(
+            @PathVariable String orgId,
+            @RequestParam(name = "from", required = false) String fromDate,
+            @RequestParam(name = "to", required = false) String toDate,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "50") int size,
+            @RequestParam(name = "sort", defaultValue = "updatedAt,desc") String sort,
+            @RequestParam(name = "status", required = false) StoreStatus status,
+            @RequestParam(name = "platform", required = false) StorePlatform platform,
+            @RequestParam(name = "code", required = false) String code,
+            @RequestParam(name = "domain", required = false) String domain) {
+        return storeService.listStores(orgId, fromDate, toDate, page, size, sort, status, platform, code, domain);
+    }
 
-  @Operation(summary = "Search websites within an organization by websiteId/code/domain")
-  @GetMapping("/search")
-  public ResponseEntity<PagedResponse<StoreSearchResponse>> searchStores(
-      @PathVariable String orgId,
-      @RequestParam(name = "websiteId", required = false) String websiteId,
-      @RequestParam(name = "code", required = false) String code,
-      @RequestParam(name = "domain", required = false) String domain,
-      @RequestParam(name = "page", defaultValue = "0") int page,
-      @RequestParam(name = "size", defaultValue = "50") int size) {
-    return storeService.searchStores(orgId, websiteId, code, domain, page, size);
-  }
+    @Operation(summary = "Search websites within an organization by websiteId/code/domain")
+    @GetMapping("/search")
+    public ResponseEntity<PagedResponse<StoreSearchResponse>> searchStores(
+            @PathVariable String orgId,
+            @RequestParam(name = "websiteId", required = false) String websiteId,
+            @RequestParam(name = "code", required = false) String code,
+            @RequestParam(name = "domain", required = false) String domain,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "50") int size) {
+        return storeService.searchStores(orgId, websiteId, code, domain, page, size);
+    }
 
-  @Operation(summary = "Get website by id")
-  @GetMapping("/{websiteId}")
-  public ResponseEntity<StoreResponse> getStoreById(
-      @PathVariable String orgId, @PathVariable String websiteId) {
-    return storeService.getStoreById(orgId, websiteId);
-  }
+    @Operation(summary = "Get website by id")
+    @GetMapping("/{websiteId}")
+    public ResponseEntity<StoreResponse> getStoreById(@PathVariable String orgId, @PathVariable String websiteId) {
+        return storeService.getStoreById(orgId, websiteId);
+    }
 
-  @Operation(summary = "Update website (full replace)")
-  @PutMapping("/{websiteId}")
-  public ResponseEntity<StoreUpdateResponse> updateStore(
-      @PathVariable String orgId,
-      @PathVariable String websiteId,
-      @RequestBody StoreUpdateRequest request) {
-    return storeService.updateStore(orgId, websiteId, request);
-  }
+    @Operation(summary = "Update website (full replace)")
+    @PutMapping("/{websiteId}")
+    public ResponseEntity<StoreUpdateResponse> updateStore(
+            @PathVariable String orgId, @PathVariable String websiteId, @RequestBody StoreUpdateRequest request) {
+        return storeService.updateStore(orgId, websiteId, request);
+    }
 
-  @Operation(summary = "Update website (partial)")
-  @PatchMapping("/{websiteId}")
-  public ResponseEntity<StorePatchResponse> patchStore(
-      @PathVariable String orgId,
-      @PathVariable String websiteId,
-      @RequestBody StorePatchRequest request) {
-    return storeService.patchStore(orgId, websiteId, request);
-  }
+    @Operation(summary = "Update website (partial)")
+    @PatchMapping("/{websiteId}")
+    public ResponseEntity<StorePatchResponse> patchStore(
+            @PathVariable String orgId, @PathVariable String websiteId, @RequestBody StorePatchRequest request) {
+        return storeService.patchStore(orgId, websiteId, request);
+    }
 
-  @Operation(summary = "Delete website")
-  @DeleteMapping("/{websiteId}")
-  public ResponseEntity<Void> deleteStore(
-      @PathVariable String orgId, @PathVariable String websiteId) {
-    return storeService.deleteStore(orgId, websiteId);
-  }
+    @Operation(summary = "Delete website")
+    @DeleteMapping("/{websiteId}")
+    public ResponseEntity<Void> deleteStore(@PathVariable String orgId, @PathVariable String websiteId) {
+        return storeService.deleteStore(orgId, websiteId);
+    }
 }

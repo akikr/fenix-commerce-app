@@ -18,33 +18,29 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice(assignableTypes = StoreController.class)
 public class StoreControllerExceptionHandler {
 
-  private static final Logger log = LoggerFactory.getLogger(StoreControllerExceptionHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(StoreControllerExceptionHandler.class);
 
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
-    log.error(
-        "Error occurred at StoreController handleGlobalException, due to {}", ex.getMessage(), ex);
-    String exMessage = ex.getMessage();
-    String truncatedErrorMessage = exMessage.substring(0, Math.min(exMessage.length(), 80)) + "...";
-    var errorResponse =
-        new ErrorResponse(
-            LocalDateTime.now().atOffset(ZoneOffset.UTC).toString(),
-            HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            "Internal Server Error",
-            truncatedErrorMessage,
-            "/organizations/{orgId}/websites/...");
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-        .body(errorResponse);
-  }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
+        log.error("Error occurred at StoreController handleGlobalException, due to {}", ex.getMessage(), ex);
+        String exMessage = ex.getMessage();
+        String truncatedErrorMessage = exMessage.substring(0, Math.min(exMessage.length(), 80)) + "...";
+        var errorResponse = new ErrorResponse(
+                LocalDateTime.now().atOffset(ZoneOffset.UTC).toString(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error",
+                truncatedErrorMessage,
+                "/organizations/{orgId}/websites/...");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .body(errorResponse);
+    }
 
-  @ExceptionHandler(StoreException.class)
-  public ResponseEntity<ErrorResponse> handleStoreException(StoreException ex) {
-    log.error(
-        "Error occurred at StoreController handleStoreException, due to {}", ex.getMessage(), ex);
-    String exMessage = ex.getMessage();
-    String truncatedErrorMessage = exMessage.substring(0, Math.min(exMessage.length(), 80)) + "...";
-    return buildErrorResponseResponseEntity(
-        ex.getStatus(), ex.getMessage(), truncatedErrorMessage, ex.getPath());
-  }
+    @ExceptionHandler(StoreException.class)
+    public ResponseEntity<ErrorResponse> handleStoreException(StoreException ex) {
+        log.error("Error occurred at StoreController handleStoreException, due to {}", ex.getMessage(), ex);
+        String exMessage = ex.getMessage();
+        String truncatedErrorMessage = exMessage.substring(0, Math.min(exMessage.length(), 80)) + "...";
+        return buildErrorResponseResponseEntity(ex.getStatus(), ex.getMessage(), truncatedErrorMessage, ex.getPath());
+    }
 }

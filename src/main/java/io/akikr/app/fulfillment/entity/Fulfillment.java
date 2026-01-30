@@ -33,107 +33,107 @@ import lombok.Setter;
 @Table(name = "fulfillments")
 public class Fulfillment {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "fulfillment_id", columnDefinition = "BINARY(16)")
-  private UUID fulfillmentId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "fulfillment_id", columnDefinition = "BINARY(16)")
+    private UUID fulfillmentId;
 
-  @ManyToOne
-  @JoinColumn(name = "tenant_id", nullable = false)
-  private Tenant tenant;
+    @ManyToOne
+    @JoinColumn(name = "tenant_id", nullable = false)
+    private Tenant tenant;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "order_id", nullable = false)
-  private Order order;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
 
-  @Column(name = "external_fulfillment_id", nullable = false, length = 128)
-  private String externalFulfillmentId;
+    @Column(name = "external_fulfillment_id", nullable = false, length = 128)
+    private String externalFulfillmentId;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "fulfillment_status", nullable = false)
-  private FulfillmentStatus fulfillmentStatus;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "fulfillment_status", nullable = false)
+    private FulfillmentStatus fulfillmentStatus;
 
-  @Column(name = "carrier", length = 64)
-  private String carrier;
+    @Column(name = "carrier", length = 64)
+    private String carrier;
 
-  @Column(name = "service_level", length = 64)
-  private String serviceLevel;
+    @Column(name = "service_level", length = 64)
+    private String serviceLevel;
 
-  @Column(name = "ship_from_location", length = 255)
-  private String shipFromLocation;
+    @Column(name = "ship_from_location", length = 255)
+    private String shipFromLocation;
 
-  @Column(name = "shipped_at")
-  private LocalDateTime shippedAt;
+    @Column(name = "shipped_at")
+    private LocalDateTime shippedAt;
 
-  @Column(name = "delivered_at")
-  private LocalDateTime deliveredAt;
+    @Column(name = "delivered_at")
+    private LocalDateTime deliveredAt;
 
-  @Builder.Default
-  @Column(name = "created_at", nullable = false, updatable = false)
-  private LocalDateTime createdAt = LocalDateTime.now();
+    @Builder.Default
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-  @Builder.Default
-  @Column(name = "updated_at", nullable = false)
-  private LocalDateTime updatedAt = LocalDateTime.now();
+    @Builder.Default
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
-  @Column(name = "raw_payload_json", columnDefinition = "JSON")
-  private String rawPayloadJson;
+    @Column(name = "raw_payload_json", columnDefinition = "JSON")
+    private String rawPayloadJson;
 
-  @OneToMany(mappedBy = "fulfillment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  private List<Tracking> tracking;
+    @OneToMany(mappedBy = "fulfillment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Tracking> tracking;
 
-  public Fulfillment() {}
+    public Fulfillment() {}
 
-  @Override
-  public String toString() {
-    return "Fulfillment{"
-        + "fulfillmentId="
-        + fulfillmentId
-        + ", tenantId="
-        + tenant.getTenantId()
-        + ", orderId="
-        + order.getOrderId()
-        + ", externalFulfillmentId='"
-        + externalFulfillmentId
-        + '\''
-        + ", fulfillmentStatus="
-        + fulfillmentStatus
-        + ", carrier='"
-        + carrier
-        + '\''
-        + ", serviceLevel='"
-        + serviceLevel
-        + '\''
-        + ", shippedAt="
-        + shippedAt
-        + ", deliveredAt="
-        + deliveredAt
-        + ", createdAt="
-        + createdAt
-        + ", updatedAt="
-        + updatedAt
-        + '}';
-  }
+    @Override
+    public String toString() {
+        return "Fulfillment{"
+                + "fulfillmentId="
+                + fulfillmentId
+                + ", tenantId="
+                + tenant.getTenantId()
+                + ", orderId="
+                + order.getOrderId()
+                + ", externalFulfillmentId='"
+                + externalFulfillmentId
+                + '\''
+                + ", fulfillmentStatus="
+                + fulfillmentStatus
+                + ", carrier='"
+                + carrier
+                + '\''
+                + ", serviceLevel='"
+                + serviceLevel
+                + '\''
+                + ", shippedAt="
+                + shippedAt
+                + ", deliveredAt="
+                + deliveredAt
+                + ", createdAt="
+                + createdAt
+                + ", updatedAt="
+                + updatedAt
+                + '}';
+    }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    Fulfillment that = (Fulfillment) o;
-    return Objects.equals(fulfillmentId, that.fulfillmentId);
-  }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Fulfillment that = (Fulfillment) o;
+        return Objects.equals(fulfillmentId, that.fulfillmentId);
+    }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(fulfillmentId);
-  }
+    @Override
+    public int hashCode() {
+        return Objects.hash(fulfillmentId);
+    }
 
-  public enum FulfillmentStatus {
-    CREATED,
-    SHIPPED,
-    DELIVERED,
-    CANCELLED,
-    FAILED,
-    UNKNOWN
-  }
+    public enum FulfillmentStatus {
+        CREATED,
+        SHIPPED,
+        DELIVERED,
+        CANCELLED,
+        FAILED,
+        UNKNOWN
+    }
 }

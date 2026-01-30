@@ -1,9 +1,9 @@
 package io.akikr.app.order.model;
 
 public enum FulfillmentStatus {
-  UNFULFILLED,
-  PARTIAL,
-  FULFILLED,
-  CANCELLED,
-  UNKNOWN
+    UNFULFILLED,
+    PARTIAL,
+    FULFILLED,
+    CANCELLED,
+    UNKNOWN
 }

@@ -9,14 +9,14 @@ import lombok.ToString;
 @ToString
 public class TenantException extends RuntimeException {
 
-  private int status;
-  private String message;
-  private String path;
+    private int status;
+    private String message;
+    private String path;
 
-  public TenantException(int status, Throwable error, String message, String path) {
-    super(error);
-    this.status = status;
-    this.message = message;
-    this.path = path;
-  }
+    public TenantException(int status, Throwable error, String message, String path) {
+        super(error);
+        this.status = status;
+        this.message = message;
+        this.path = path;
+    }
 }

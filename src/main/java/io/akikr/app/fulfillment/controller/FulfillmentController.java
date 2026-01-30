@@ -30,78 +30,77 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/orders/{orderId}/fulfillments")
 public class FulfillmentController {
 
-  private final FulfillmentCommandService fulfillmentCommandService;
+    private final FulfillmentCommandService fulfillmentCommandService;
 
-  public FulfillmentController(FulfillmentCommandService fulfillmentCommandService) {
-    this.fulfillmentCommandService = fulfillmentCommandService;
-  }
+    public FulfillmentController(FulfillmentCommandService fulfillmentCommandService) {
+        this.fulfillmentCommandService = fulfillmentCommandService;
+    }
 
-  @Operation(summary = "Create fulfillment for an order")
-  @PostMapping
-  public ResponseEntity<FulfillmentCreateResponse> createFulfillment(
-      @PathVariable String orderId, @RequestBody FulfillmentCreateRequest request) {
-    return fulfillmentCommandService.createFulfillment(orderId, request);
-  }
+    @Operation(summary = "Create fulfillment for an order")
+    @PostMapping
+    public ResponseEntity<FulfillmentCreateResponse> createFulfillment(
+            @PathVariable String orderId, @RequestBody FulfillmentCreateRequest request) {
+        return fulfillmentCommandService.createFulfillment(orderId, request);
+    }
 
-  @Operation(summary = "List/search fulfillments for an order (date range + pagination)")
-  @GetMapping
-  public ResponseEntity<PagedResponse<FulfillmentSearchResponse>> listFulfillments(
-      @PathVariable String orderId,
-      @RequestParam(name = "from", required = false) String fromDate,
-      @RequestParam(name = "to", required = false) String toDate,
-      @RequestParam(name = "page", defaultValue = "0") int page,
-      @RequestParam(name = "size", defaultValue = "50") int size,
-      @RequestParam(name = "sort", defaultValue = "updatedAt,desc") String sort,
-      @RequestParam(name = "status", required = false) FulfillmentCreateStatus status,
-      @RequestParam(name = "carrier", required = false) String carrier) {
-    // TODO: Implement service layer
-    return ResponseEntity.ok().build();
-  }
+    @Operation(summary = "List/search fulfillments for an order (date range + pagination)")
+    @GetMapping
+    public ResponseEntity<PagedResponse<FulfillmentSearchResponse>> listFulfillments(
+            @PathVariable String orderId,
+            @RequestParam(name = "from", required = false) String fromDate,
+            @RequestParam(name = "to", required = false) String toDate,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "50") int size,
+            @RequestParam(name = "sort", defaultValue = "updatedAt,desc") String sort,
+            @RequestParam(name = "status", required = false) FulfillmentCreateStatus status,
+            @RequestParam(name = "carrier", required = false) String carrier) {
+        // TODO: Implement service layer
+        return ResponseEntity.ok().build();
+    }
 
-  @Operation(summary = "Search fulfillment by external fulfillment id")
-  @GetMapping("/search")
-  public ResponseEntity<PagedResponse<FulfillmentSearchResponse>> searchFulfillmentsByExternal(
-      @PathVariable String orderId,
-      @RequestParam(name = "externalFulfillmentId") String externalFulfillmentId,
-      @RequestParam(name = "page", defaultValue = "0") int page,
-      @RequestParam(name = "size", defaultValue = "50") int size) {
-    // TODO: Implement service layer
-    return ResponseEntity.ok().build();
-  }
+    @Operation(summary = "Search fulfillment by external fulfillment id")
+    @GetMapping("/search")
+    public ResponseEntity<PagedResponse<FulfillmentSearchResponse>> searchFulfillmentsByExternal(
+            @PathVariable String orderId,
+            @RequestParam(name = "externalFulfillmentId") String externalFulfillmentId,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "50") int size) {
+        // TODO: Implement service layer
+        return ResponseEntity.ok().build();
+    }
 
-  @Operation(summary = "Get fulfillment by id")
-  @GetMapping("/{fulfillmentId}")
-  public ResponseEntity<FulfillmentResponse> getFulfillmentById(
-      @PathVariable String orderId, @PathVariable String fulfillmentId) {
-    // TODO: Implement service layer
-    return ResponseEntity.ok().build();
-  }
+    @Operation(summary = "Get fulfillment by id")
+    @GetMapping("/{fulfillmentId}")
+    public ResponseEntity<FulfillmentResponse> getFulfillmentById(
+            @PathVariable String orderId, @PathVariable String fulfillmentId) {
+        // TODO: Implement service layer
+        return ResponseEntity.ok().build();
+    }
 
-  @Operation(summary = "Update fulfillment (full replace)")
-  @PutMapping("/{fulfillmentId}")
-  public ResponseEntity<FulfillmentUpdateResponse> updateFulfillment(
-      @PathVariable String orderId,
-      @PathVariable String fulfillmentId,
-      @RequestBody FulfillmentUpdateRequest request) {
-    // TODO: Implement service layer
-    return ResponseEntity.ok().build();
-  }
+    @Operation(summary = "Update fulfillment (full replace)")
+    @PutMapping("/{fulfillmentId}")
+    public ResponseEntity<FulfillmentUpdateResponse> updateFulfillment(
+            @PathVariable String orderId,
+            @PathVariable String fulfillmentId,
+            @RequestBody FulfillmentUpdateRequest request) {
+        // TODO: Implement service layer
+        return ResponseEntity.ok().build();
+    }
 
-  @Operation(summary = "Update fulfillment (partial)")
-  @PatchMapping("/{fulfillmentId}")
-  public ResponseEntity<FulfillmentPatchResponse> patchFulfillment(
-      @PathVariable String orderId,
-      @PathVariable String fulfillmentId,
-      @RequestBody FulfillmentPatchRequest request) {
-    // TODO: Implement service layer
-    return ResponseEntity.ok().build();
-  }
+    @Operation(summary = "Update fulfillment (partial)")
+    @PatchMapping("/{fulfillmentId}")
+    public ResponseEntity<FulfillmentPatchResponse> patchFulfillment(
+            @PathVariable String orderId,
+            @PathVariable String fulfillmentId,
+            @RequestBody FulfillmentPatchRequest request) {
+        // TODO: Implement service layer
+        return ResponseEntity.ok().build();
+    }
 
-  @Operation(summary = "Delete fulfillment")
-  @DeleteMapping("/{fulfillmentId}")
-  public ResponseEntity<Void> deleteFulfillment(
-      @PathVariable String orderId, @PathVariable String fulfillmentId) {
-    // TODO: Implement service layer
-    return ResponseEntity.noContent().build();
-  }
+    @Operation(summary = "Delete fulfillment")
+    @DeleteMapping("/{fulfillmentId}")
+    public ResponseEntity<Void> deleteFulfillment(@PathVariable String orderId, @PathVariable String fulfillmentId) {
+        // TODO: Implement service layer
+        return ResponseEntity.noContent().build();
+    }
 }

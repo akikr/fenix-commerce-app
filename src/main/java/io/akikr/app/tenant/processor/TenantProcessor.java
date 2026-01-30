@@ -13,35 +13,34 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class TenantProcessor {
 
-  private final TenantRepository tenantRepository;
+    private final TenantRepository tenantRepository;
 
-  public TenantProcessor(TenantRepository tenantRepository) {
-    this.tenantRepository = tenantRepository;
-  }
+    public TenantProcessor(TenantRepository tenantRepository) {
+        this.tenantRepository = tenantRepository;
+    }
 
-  @Transactional(rollbackFor = Exception.class)
-  public Tenant saveTenant(Tenant tenant) {
-    return tenantRepository.save(tenant);
-  }
+    @Transactional(rollbackFor = Exception.class)
+    public Tenant saveTenant(Tenant tenant) {
+        return tenantRepository.save(tenant);
+    }
 
-  @Transactional(readOnly = true)
-  public Page<Tenant> findBySpecification(
-      Specification<Tenant> tenantSpecification, PageRequest pageable) {
-    return tenantRepository.findAll(tenantSpecification, pageable);
-  }
+    @Transactional(readOnly = true)
+    public Page<Tenant> findBySpecification(Specification<Tenant> tenantSpecification, PageRequest pageable) {
+        return tenantRepository.findAll(tenantSpecification, pageable);
+    }
 
-  @Transactional(readOnly = true)
-  public Page<Tenant> findByTenantId(UUID tenantId, PageRequest pageable) {
-    return tenantRepository.findByTenantId(tenantId, pageable);
-  }
+    @Transactional(readOnly = true)
+    public Page<Tenant> findByTenantId(UUID tenantId, PageRequest pageable) {
+        return tenantRepository.findByTenantId(tenantId, pageable);
+    }
 
-  @Transactional(readOnly = true)
-  public Optional<Tenant> findByTenantId(UUID tenantId) {
-    return tenantRepository.findByTenantId(tenantId);
-  }
+    @Transactional(readOnly = true)
+    public Optional<Tenant> findByTenantId(UUID tenantId) {
+        return tenantRepository.findByTenantId(tenantId);
+    }
 
-  @Transactional(readOnly = true)
-  public Page<Tenant> findByExternalId(String externalId, PageRequest pageable) {
-    return tenantRepository.findByExternalId(externalId, pageable);
-  }
+    @Transactional(readOnly = true)
+    public Page<Tenant> findByExternalId(String externalId, PageRequest pageable) {
+        return tenantRepository.findByExternalId(externalId, pageable);
+    }
 }
