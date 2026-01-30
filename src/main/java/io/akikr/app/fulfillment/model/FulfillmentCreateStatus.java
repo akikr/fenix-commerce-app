@@ -1,6 +1,6 @@
 package io.akikr.app.fulfillment.model;
 
-public enum FulfillmentStatus {
+public enum FulfillmentCreateStatus {
   CREATED,
   SHIPPED,
   DELIVERED,

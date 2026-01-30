@@ -1,6 +1,6 @@
 package io.akikr.app.fulfillment.controller;
 
-import io.akikr.app.fulfillment.model.FulfillmentStatus;
+import io.akikr.app.fulfillment.model.FulfillmentCreateStatus;
 import io.akikr.app.fulfillment.model.request.FulfillmentCreateRequest;
 import io.akikr.app.fulfillment.model.request.FulfillmentPatchRequest;
 import io.akikr.app.fulfillment.model.request.FulfillmentUpdateRequest;
@@ -9,6 +9,7 @@ import io.akikr.app.fulfillment.model.response.FulfillmentPatchResponse;
 import io.akikr.app.fulfillment.model.response.FulfillmentResponse;
 import io.akikr.app.fulfillment.model.response.FulfillmentSearchResponse;
 import io.akikr.app.fulfillment.model.response.FulfillmentUpdateResponse;
+import io.akikr.app.fulfillment.service.FulfillmentCommandService;
 import io.akikr.app.shared.PagedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,12 +30,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/orders/{orderId}/fulfillments")
 public class FulfillmentController {
 
+  private final FulfillmentCommandService fulfillmentCommandService;
+
+  public FulfillmentController(FulfillmentCommandService fulfillmentCommandService) {
+    this.fulfillmentCommandService = fulfillmentCommandService;
+  }
+
   @Operation(summary = "Create fulfillment for an order")
   @PostMapping
   public ResponseEntity<FulfillmentCreateResponse> createFulfillment(
       @PathVariable String orderId, @RequestBody FulfillmentCreateRequest request) {
-    // TODO: Implement service layer
-    return ResponseEntity.ok().build();
+    return fulfillmentCommandService.createFulfillment(orderId, request);
   }
 
   @Operation(summary = "List/search fulfillments for an order (date range + pagination)")
@@ -46,7 +52,7 @@ public class FulfillmentController {
       @RequestParam(name = "page", defaultValue = "0") int page,
       @RequestParam(name = "size", defaultValue = "50") int size,
       @RequestParam(name = "sort", defaultValue = "updatedAt,desc") String sort,
-      @RequestParam(name = "status", required = false) FulfillmentStatus status,
+      @RequestParam(name = "status", required = false) FulfillmentCreateStatus status,
       @RequestParam(name = "carrier", required = false) String carrier) {
     // TODO: Implement service layer
     return ResponseEntity.ok().build();
