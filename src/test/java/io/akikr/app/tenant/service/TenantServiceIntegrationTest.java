@@ -154,7 +154,8 @@ public class TenantServiceIntegrationTest extends MySqlTestContainer {
     assertThrowsExactly(
         TenantException.class,
         () ->
-            tenantService.searchTenants(invalidFromDate, null, 0, 10, "createdAt,asc", null, null));
+            tenantService.searchTenants(
+                invalidFromDate, invalidFromDate, 0, 10, "createdAt,asc", null, null));
   }
 
   @Test

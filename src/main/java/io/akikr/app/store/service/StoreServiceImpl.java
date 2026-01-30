@@ -18,7 +18,7 @@ import io.akikr.app.store.model.response.StorePatchResponse;
 import io.akikr.app.store.model.response.StoreResponse;
 import io.akikr.app.store.model.response.StoreSearchResponse;
 import io.akikr.app.store.model.response.StoreUpdateResponse;
-import io.akikr.app.store.processor.ServiceProcessor;
+import io.akikr.app.store.processor.StoreProcessor;
 import io.akikr.app.store.repository.StoreSpecifications;
 import io.akikr.app.tenant.entity.Tenant;
 import io.akikr.app.tenant.processor.TenantProcessor;
@@ -39,11 +39,11 @@ import org.springframework.stereotype.Service;
 public class StoreServiceImpl implements StoreService {
 
   private static final Logger log = LoggerFactory.getLogger(StoreServiceImpl.class);
-  private final ServiceProcessor serviceProcessor;
+  private final StoreProcessor storeProcessor;
   private final TenantProcessor tenantProcessor;
 
-  public StoreServiceImpl(ServiceProcessor serviceProcessor, TenantProcessor tenantProcessor) {
-    this.serviceProcessor = serviceProcessor;
+  public StoreServiceImpl(StoreProcessor storeProcessor, TenantProcessor tenantProcessor) {
+    this.storeProcessor = storeProcessor;
     this.tenantProcessor = tenantProcessor;
   }
 
@@ -59,7 +59,7 @@ public class StoreServiceImpl implements StoreService {
               .orElseThrow(
                   () -> new RuntimeException("No Tenant found with tenantId: " + tenantId));
       var store = toStore(tenant, request);
-      var savedStore = serviceProcessor.saveStore(store);
+      var savedStore = storeProcessor.saveStore(store);
       log.info("Store created successfully with id:[{}]", savedStore.getStoreId());
       var response = toStoreCreateResponse(savedStore);
       return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -109,7 +109,7 @@ public class StoreServiceImpl implements StoreService {
       var storeSpecification =
           StoreSpecifications.withOptionalFilters(
               tenantId, fromDate, toDate, status, platform, code, domain);
-      var storePage = serviceProcessor.findBySpecification(storeSpecification, pageable);
+      var storePage = storeProcessor.findBySpecification(storeSpecification, pageable);
       log.info(
           "Stores list completed successfully for orgId:[{}] with totalElements:[{}]",
           orgId,
@@ -154,7 +154,7 @@ public class StoreServiceImpl implements StoreService {
       var pageable = PageRequest.of(page, size);
       var storeSpecification =
           StoreSpecifications.withSearchFilters(tenantId, websiteId, code, domain);
-      var storePage = serviceProcessor.findBySpecification(storeSpecification, pageable);
+      var storePage = storeProcessor.findBySpecification(storeSpecification, pageable);
       log.info(
           "Stores search completed successfully for orgId:[{}] with totalElements:[{}]",
           orgId,
@@ -186,7 +186,7 @@ public class StoreServiceImpl implements StoreService {
 
       var storeId = UUID.fromString(websiteId);
       var store =
-          serviceProcessor
+          storeProcessor
               .findByStoreIdAndTenantId(storeId, tenant.getTenantId())
               .orElseThrow(() -> new RuntimeException("No Store found with id: " + websiteId));
       log.info("Store fetched successfully for storeId[{}]", websiteId);
@@ -223,13 +223,13 @@ public class StoreServiceImpl implements StoreService {
 
       var storeId = UUID.fromString(websiteId);
       var existingStore =
-          serviceProcessor
+          storeProcessor
               .findByStoreIdAndTenantId(storeId, tenantId)
               .orElseThrow(() -> new RuntimeException("No Store found with id: " + websiteId));
       log.debug("Store found for storeId[{}]", websiteId);
 
       var newStore = toStore(existingStore, tenant, request);
-      var updatedStore = serviceProcessor.saveStore(newStore);
+      var updatedStore = storeProcessor.saveStore(newStore);
       log.info("Store updated successfully for storeId[{}]", websiteId);
       var response = toStoreUpdateResponse(updatedStore);
       return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -263,13 +263,13 @@ public class StoreServiceImpl implements StoreService {
 
       var storeId = UUID.fromString(websiteId);
       var existingStore =
-          serviceProcessor
+          storeProcessor
               .findByStoreIdAndTenantId(storeId, tenantId)
               .orElseThrow(() -> new RuntimeException("No Store found with id: " + websiteId));
       log.debug("Store found for storeId:[{}]", websiteId);
 
       var patchedStore = buildStore(existingStore, tenant, request);
-      var updatedStore = serviceProcessor.saveStore(patchedStore);
+      var updatedStore = storeProcessor.saveStore(patchedStore);
       log.info("Store patched successfully for storeId:[{}]", websiteId);
       var response = toStorePatchResponse(updatedStore);
       return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -302,7 +302,7 @@ public class StoreServiceImpl implements StoreService {
 
       var storeId = UUID.fromString(websiteId);
       Store existingStore =
-          serviceProcessor
+          storeProcessor
               .findByStoreIdAndTenantId(storeId, tenantId)
               .orElseThrow(() -> new RuntimeException("No Store found with id: " + websiteId));
       log.debug("Store found for storeId[{}]", websiteId);
@@ -313,7 +313,7 @@ public class StoreServiceImpl implements StoreService {
       }
 
       existingStore.setStatus(Status.INACTIVE);
-      var deactivatedStore = serviceProcessor.saveStore(existingStore);
+      var deactivatedStore = storeProcessor.saveStore(existingStore);
       log.info("Store with storeId:[{}] deactivated successfully", deactivatedStore.getStoreId());
       return ResponseEntity.noContent().build();
     } catch (NullPointerException | IllegalArgumentException e) {
@@ -335,7 +335,7 @@ public class StoreServiceImpl implements StoreService {
   public Store verifyStoreBelongsToTenant(String orgId, String storeId) throws StoreException {
     log.info("Verifying store for orgId:[{}] and storeId:[{}]", orgId, storeId);
     try {
-      return serviceProcessor
+      return storeProcessor
           .findByStoreIdAndTenantId(UUID.fromString(storeId), UUID.fromString(orgId))
           .orElseThrow(
               () ->
@@ -345,7 +345,7 @@ public class StoreServiceImpl implements StoreService {
                           + "] not found or does not belong to orgId:["
                           + orgId
                           + "]"));
-    } catch (IllegalArgumentException e) {
+    } catch (NullPointerException | IllegalArgumentException e) {
       log.error(
           "Error verifying store for orgId:[{}] and storeId:[{}] due to: {}",
           orgId,

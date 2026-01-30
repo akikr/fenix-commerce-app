@@ -147,7 +147,7 @@ public class TenantServiceImpl implements TenantService {
       throw new TenantException(
           HttpStatus.INTERNAL_SERVER_ERROR.value(),
           e,
-          "An errorDetails occurred while searching the organization",
+          "An error occurred while searching the organization",
           "/organizations/search");
     }
   }
