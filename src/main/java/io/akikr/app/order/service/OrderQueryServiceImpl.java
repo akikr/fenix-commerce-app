@@ -15,10 +15,13 @@ import io.akikr.app.store.processor.StoreProcessor;
 import io.akikr.app.tenant.processor.TenantProcessor;
 import java.util.Objects;
 import java.util.UUID;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -43,9 +46,9 @@ public class OrderQueryServiceImpl implements OrderQueryService {
   @Override
   public ResponseEntity<PagedResponse<OrderSearchResponse>> searchOrderByExternal(
       String orgId,
-      String websiteId,
-      String externalOrderId,
-      String externalOrderNumber,
+      @Nullable String websiteId,
+      @Nullable String externalOrderId,
+      @Nullable String externalOrderNumber,
       int page,
       int size)
       throws OrderException {
@@ -88,7 +91,7 @@ public class OrderQueryServiceImpl implements OrderQueryService {
       log.debug("Searching for orders by orderSpecification:[{}]", orderSpecification);
       var orderPage = orderProcessor.findBySpecification(orderSpecification, pageable);
       log.info(
-          "Stores search completed successfully for tenantId:[{}] with totalElements:[{}]",
+          "Order search completed successfully for tenantId:[{}] with totalElements:[{}]",
           orgId,
           orderPage.getTotalElements());
       var response = toPagedOrderSearchResponse(orderPage);
@@ -110,6 +113,117 @@ public class OrderQueryServiceImpl implements OrderQueryService {
           "An error occurred while searching for orders",
           "/orders/search");
     }
+  }
+
+  @Override
+  public ResponseEntity<PagedResponse<OrderSearchResponse>> searchOrders(
+      String orgId,
+      @Nullable String websiteId,
+      @Nullable OrderStatus orderStatus,
+      @Nullable FinancialStatus financialStatus,
+      @Nullable FulfillmentStatus fulfillmentStatus,
+      @Nullable String fromDate,
+      @Nullable String toDate,
+      int page,
+      int size,
+      String sort)
+      throws OrderException {
+    log.info(
+        "Searching for orders by tenantId:[{}], storeId:[{}], orderStatus:[{}], financialStatus:[{}], fulfillmentStatus:[{}] for fromDate:[{}], toDate:[{}],  page:[{}], size:[{}], sortBy:[{}]",
+        orgId,
+        websiteId,
+        orderStatus,
+        financialStatus,
+        fulfillmentStatus,
+        fromDate,
+        toDate,
+        page,
+        size,
+        sort);
+    try {
+      var sortBy = convertToOrderSort(sort);
+      var pageable = PageRequest.of(page, size, sortBy);
+      var existingTenantId = UUID.fromString(orgId);
+      var tenant =
+          tenantProcessor
+              .findByTenantId(existingTenantId)
+              .orElseThrow(
+                  () -> new RuntimeException("No Tenant found with tenantId: " + existingTenantId));
+      log.debug("Found existing tenant with id:[{}]", existingTenantId);
+      UUID storeId = null;
+      if (hasText(websiteId)) {
+        var existingStoreId = UUID.fromString(websiteId);
+        var store =
+            storeProcessor
+                .findByStoreIdAndTenantId(existingStoreId, existingTenantId)
+                .orElseThrow(
+                    () ->
+                        new RuntimeException(
+                            "No Store found with id: "
+                                + websiteId
+                                + " and for tenantId: "
+                                + existingTenantId));
+        storeId = store.getStoreId();
+        log.info("Found store id:[{}] for tenantId:[{}]", storeId, existingTenantId);
+      }
+      var orderSpecification =
+          OrderSpecifications.withSearchFilters(
+              tenant.getTenantId(),
+              storeId,
+              orderStatus,
+              financialStatus,
+              fulfillmentStatus,
+              fromDate,
+              toDate);
+      log.debug("Searching for orders by orderSpecification:[{}]", orderSpecification);
+      var orderPage = orderProcessor.findBySpecification(orderSpecification, pageable);
+      log.info(
+          "Order search completed successfully for tenantId:[{}] with totalElements:[{}]",
+          orgId,
+          orderPage.getTotalElements());
+      var response = toPagedOrderSearchResponse(orderPage);
+      return ResponseEntity.status(HttpStatus.OK).body(response);
+    } catch (RuntimeException e) {
+      log.error(
+          "Error searching for orders by tenantId:[{}], storeId:[{}], orderStatus:[{}], financialStatus:[{}], fulfillmentStatus:[{}] for fromDate:[{}], toDate:[{}],  page:[{}], size:[{}], sortBy:[{}], due to: {}",
+          orgId,
+          websiteId,
+          orderStatus,
+          financialStatus,
+          fulfillmentStatus,
+          fromDate,
+          toDate,
+          page,
+          size,
+          sort,
+          e.getMessage(),
+          e);
+      throw new OrderException(
+          HttpStatus.INTERNAL_SERVER_ERROR.value(),
+          e,
+          "An error occurred while searching for orders",
+          "/orders");
+    }
+  }
+
+  private @NonNull Sort convertToOrderSort(String sortStr) {
+
+    // Split "updatedAt,desc" into ["updatedAt", "desc"]
+    String[] parts = sortStr.split(",");
+    var property =
+        switch (parts[0]) {
+          case "updatedAt" -> "orderUpdatedAt";
+          case "createdAt" -> "orderCreatedAt";
+          default ->
+              throw new UnsupportedOperationException(
+                  "Unsupported sortBy value:[" + parts[0] + "]");
+        };
+    // Default to ascending if no direction is provided or if invalid
+    Sort.Direction direction = Sort.Direction.ASC;
+    if (parts.length > 1 && parts[1].equalsIgnoreCase("desc")) {
+      direction = Sort.Direction.DESC;
+    }
+    return Sort.by(direction, property);
   }
 
   private PagedResponse<OrderSearchResponse> toPagedOrderSearchResponse(Page<Order> orderPage) {

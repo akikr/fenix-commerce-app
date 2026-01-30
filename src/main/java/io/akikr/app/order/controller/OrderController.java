@@ -55,15 +55,24 @@ public class OrderController {
       @RequestParam(name = "websiteId", required = false) String websiteId,
       @RequestParam(name = "from", required = false) String fromDate,
       @RequestParam(name = "to", required = false) String toDate,
-      @RequestParam(name = "page", defaultValue = "0") int page,
-      @RequestParam(name = "size", defaultValue = "50") int size,
-      @RequestParam(name = "sort", defaultValue = "updatedAt,desc") String sort,
-      @RequestParam(name = "status", required = false) OrderStatus status,
+      @RequestParam(name = "status", required = false) OrderStatus orderStatus,
       @RequestParam(name = "financialStatus", required = false) FinancialStatus financialStatus,
       @RequestParam(name = "fulfillmentStatus", required = false)
-          FulfillmentStatus fulfillmentStatus) {
-    // TODO: Implement service layer
-    return ResponseEntity.ok().build();
+          FulfillmentStatus fulfillmentStatus,
+      @RequestParam(name = "page", defaultValue = "0") int page,
+      @RequestParam(name = "size", defaultValue = "50") int size,
+      @RequestParam(name = "sort", defaultValue = "updatedAt,desc") String sort) {
+    return orderQueryService.searchOrders(
+        orgId,
+        websiteId,
+        orderStatus,
+        financialStatus,
+        fulfillmentStatus,
+        fromDate,
+        toDate,
+        page,
+        size,
+        sort);
   }
 
   @Operation(summary = "Search order by external order id/number")
