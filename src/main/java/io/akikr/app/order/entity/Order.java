@@ -39,7 +39,7 @@ public class Order {
   @Column(name = "order_id", columnDefinition = "BINARY(16)")
   private UUID orderId;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "tenant_id", nullable = false)
   private Tenant tenant;
 
@@ -80,6 +80,7 @@ public class Order {
   @Column(name = "order_updated_at")
   private LocalDateTime orderUpdatedAt;
 
+  @Builder.Default
   @Column(name = "ingested_at", nullable = false)
   private LocalDateTime ingestedAt = LocalDateTime.now();
 

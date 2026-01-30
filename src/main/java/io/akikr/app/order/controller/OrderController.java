@@ -12,6 +12,7 @@ import io.akikr.app.order.model.response.OrderSearchResponse;
 import io.akikr.app.order.model.response.OrderUpdateResponse;
 import io.akikr.app.order.model.response.OrderUpsertResponse;
 import io.akikr.app.order.service.OrderCommandService;
+import io.akikr.app.order.service.OrderQueryService;
 import io.akikr.app.shared.PagedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,9 +34,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController {
 
   private final OrderCommandService orderCommandService;
+  private final OrderQueryService orderQueryService;
 
-  public OrderController(OrderCommandService orderCommandService) {
+  public OrderController(
+      OrderCommandService orderCommandService, OrderQueryService orderQueryService) {
     this.orderCommandService = orderCommandService;
+    this.orderQueryService = orderQueryService;
   }
 
   @Operation(summary = "Create (or upsert) order")
@@ -71,8 +75,8 @@ public class OrderController {
       @RequestParam(name = "externalOrderNumber", required = false) String externalOrderNumber,
       @RequestParam(name = "page", defaultValue = "0") int page,
       @RequestParam(name = "size", defaultValue = "50") int size) {
-    // TODO: Implement service layer
-    return ResponseEntity.ok().build();
+    return orderQueryService.searchOrderByExternal(
+        orgId, websiteId, externalOrderId, externalOrderNumber, page, size);
   }
 
   @Operation(summary = "Get order by id")

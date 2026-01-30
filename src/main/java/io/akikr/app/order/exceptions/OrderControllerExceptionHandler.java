@@ -4,7 +4,6 @@ import static io.akikr.app.shared.AppUtils.buildErrorResponseResponseEntity;
 
 import io.akikr.app.order.controller.OrderController;
 import io.akikr.app.shared.ErrorResponse;
-import io.akikr.app.tenant.exceptions.TenantException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import org.slf4j.Logger;
@@ -41,7 +40,7 @@ public class OrderControllerExceptionHandler {
   }
 
   @ExceptionHandler(OrderException.class)
-  public ResponseEntity<ErrorResponse> handleTenantException(TenantException ex) {
+  public ResponseEntity<ErrorResponse> handleTenantException(OrderException ex) {
     log.error(
         "Error occurred at OrderController handleTenantException, due to {}", ex.getMessage(), ex);
     String exMessage = ex.getMessage();

@@ -4,10 +4,12 @@ import io.akikr.app.order.entity.Order;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface OrderRepository extends JpaRepository<Order, UUID> {
+public interface OrderRepository
+    extends JpaRepository<Order, UUID>, JpaSpecificationExecutor<Order> {
 
   /**
    * Finds an {@link Optional} of {@link Order} by the tenant's ID, store's ID, and external order
